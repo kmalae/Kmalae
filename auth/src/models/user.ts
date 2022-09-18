@@ -11,7 +11,7 @@ interface UserAttr {
 	phoneNumber: number;
 }
 
-interface UserDoc extends UserAttr, mongoose.Document {
+export interface UserDoc extends UserAttr, mongoose.Document {
 	fullName: string;
 	createdAt: Date;
 	emailLastUpdatedAt?: Date;
