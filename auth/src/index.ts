@@ -9,6 +9,7 @@ import { signupRouter } from "./routes/user/signup";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
+import { signinRouter } from "./routes/user/signin";
 
 const app = express();
 app.set("trust proxy", true);
@@ -21,6 +22,7 @@ app.use(
 );
 
 app.use(signupRouter);
+app.use(signinRouter);
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
 });
