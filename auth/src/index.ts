@@ -6,10 +6,11 @@ import cookieSession from "cookie-session";
 
 // importing routers
 import { signupRouter } from "./routes/user/signup";
+import { signinRouter } from "./routes/user/signin";
+import { currentUserRouter } from "./routes/user/current-user";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
-import { signinRouter } from "./routes/user/signin";
 
 const app = express();
 app.set("trust proxy", true);
@@ -23,6 +24,7 @@ app.use(
 
 app.use(signupRouter);
 app.use(signinRouter);
+app.use(currentUserRouter);
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
 });
