@@ -1,68 +1,72 @@
 import mongoose from "mongoose";
-import {Password} from "../services/password";
+import { Password } from "../services/password";
 
 interface UserAttr {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  IDNumber: number;
-  dateOfBirth: Date;
-  phoneNumber: number;
+	email: string;
+	password: string;
+	firstName: string;
+	lastName: string;
+	IDNumber: number;
+	dateOfBirth: Date;
+	phoneNumber: number;
 }
 
 interface UserDoc extends UserAttr, mongoose.Document {
-  fullName: string;
-  createdAt: Date;
-  emailLastUpdatedAt?: Date;
-  passwordLastUpdatedAt?: Date;
+	fullName: string;
+	createdAt: Date;
+	emailLastUpdatedAt?: Date;
+	passwordLastUpdatedAt?: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
-  build(attr: UserAttr): UserDoc; 
+	build(attr: UserAttr): UserDoc;
 }
 
-const userSchema = new mongoose.Schema({
-  email: {type: String, required: true},
-  password: {type: String, required: true},
-  firstName: {type: String, required: true},
-  lastName: {type: String, required: true},
-  IDNumber: {type: Number, required: true},
-  dateOfBirth: {type: Date, required: true},
-  phoneNumber: {type: Number, required: true},
-  createdAt: {type: Date, required: true, default: Date.now},
-  emailLastUpdatedAt: {type: Date, required: false},
-  passwordLastUpdatedAt: {type: Date, required: false},
-}, {
-  toJSON: {
-    transform(doc, ret) {
-      ret.id = ret._id;
-      delete ret._id;
-      delete ret.password;
-      delete ret.__v;
-    }
-  }, timestamps: {createdAt: false}
-});
+const userSchema = new mongoose.Schema(
+	{
+		email: { type: String, required: true },
+		password: { type: String, required: true },
+		firstName: { type: String, required: true },
+		lastName: { type: String, required: true },
+		IDNumber: { type: Number, required: true },
+		dateOfBirth: { type: Date, required: true },
+		phoneNumber: { type: Number, required: true },
+		createdAt: { type: Date, required: true, default: Date.now },
+		emailLastUpdatedAt: { type: Date, required: false },
+		passwordLastUpdatedAt: { type: Date, required: false },
+	},
+	{
+		toJSON: {
+			transform(doc, ret) {
+				ret.id = ret._id;
+				delete ret._id;
+				delete ret.password;
+				delete ret.__v;
+			},
+		},
+		timestamps: { createdAt: false },
+	}
+);
 
-userSchema.index({email: 1});
+userSchema.index({ email: 1 });
 
-userSchema.virtual("fullName").get(function(this: UserDoc) {
-  return `${this.firstName} ${this.lastName}`;
+userSchema.virtual("fullName").get(function (this: UserDoc) {
+	return `${this.firstName} ${this.lastName}`;
 });
 
 userSchema.statics.build = (attrs: UserAttr) => {
-  return new User(attrs);
+	return new User(attrs);
 };
 
-userSchema.pre("save", async function(this: UserDoc, done) {
-  if(this.isModified("password")) {
-    const hashed = await Password.toHash(this.get("password"));
-    this.set("password", hashed);
-  }
+userSchema.pre("save", async function (this: UserDoc, done) {
+	if (this.isModified("password")) {
+		const hashed = await Password.toHash(this.get("password"));
+		this.set("password", hashed);
+	}
 
-  done();
-})
+	done();
+});
 
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 
-export {User};
+export { User };
