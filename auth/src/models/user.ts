@@ -14,7 +14,6 @@ interface UserAttr {
 export interface UserDoc extends UserAttr, mongoose.Document {
 	fullName: string;
 	createdAt: Date;
-	emailLastUpdatedAt?: Date;
 	passwordLastUpdatedAt?: Date;
 }
 
@@ -32,7 +31,6 @@ const userSchema = new mongoose.Schema(
 		dateOfBirth: { type: Date, required: true },
 		phoneNumber: { type: Number, required: true },
 		createdAt: { type: Date, required: true, default: Date.now },
-		emailLastUpdatedAt: { type: Date, required: false },
 		passwordLastUpdatedAt: { type: Date, required: false },
 	},
 	{
