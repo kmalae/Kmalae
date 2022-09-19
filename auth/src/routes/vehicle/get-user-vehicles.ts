@@ -5,7 +5,6 @@ import { Vehicle } from "../../models/vehicle";
 
 // importing error-types and middlewares
 import { BadRequestError, currentUser } from "@kmalae.ltd/library";
-import { User } from "../../models/user";
 
 const router = express.Router();
 

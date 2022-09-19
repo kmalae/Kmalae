@@ -17,9 +17,11 @@ const router = express.Router();
 router.post(
 	"/api/users/getVehicleInfo",
 	[
-		body("vehicleID").custom((input: string) => {
-			return mongoose.Types.ObjectId.isValid(input);
-		}),
+		body("vehicleID")
+			.custom((input: string) => {
+				return mongoose.Types.ObjectId.isValid(input);
+			})
+			.withMessage("Invalid vehicle ID"),
 	],
 	currentUser,
 	validateRequest,

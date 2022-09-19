@@ -62,41 +62,21 @@ router.post(
 		const { email, firstName, lastName, IDNumber, dateOfBirth, phoneNumber } =
 			req.body;
 
-		await User.findOneAndUpdate(
-			{
-				email: req.currentUser.email,
-			},
-			{
+		const existingUser = await User.findById(req.currentUser.id);
+		if (!existingUser) throw new BadRequestError("User does not exist");
+
+		existingUser
+			.set({
 				email,
 				firstName,
 				lastName,
 				IDNumber,
 				dateOfBirth,
 				phoneNumber,
-			},
-			{ upsert: false },
-			function (err, doc) {
-				if (err) throw new BadRequestError("User does not exist");
+			})
+			.save();
 
-				const userJwt = jwt.sign(
-					{
-						id: doc!.id,
-						email: doc!.email,
-					},
-					process.env.JWT_KEY!
-				);
-
-				req.session = {
-					jwt: userJwt,
-				};
-			}
-		)
-			.clone()
-			.catch(function (err) {
-				console.log(err);
-			});
-
-		res.status(200).send({});
+		res.status(200).send(existingUser);
 	}
 );
 

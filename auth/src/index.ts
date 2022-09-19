@@ -14,11 +14,12 @@ import { updateInfoRouter } from "./routes/user/update-info";
 import { updatePasswordRouter } from "./routes/user/update-password";
 import { registerVehicleRouter } from "./routes/vehicle/register-vehicle";
 import { getUserVehiclesRouter } from "./routes/vehicle/get-user-vehicles";
+import { getVehicleInfoRouter } from "./routes/vehicle/get-vehicle-info";
 import { deleteVehicleRouter } from "./routes/vehicle/delete-vehicle";
+import { updateVehicleRouter } from "./routes/vehicle/update-vehicle";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
-import { getVehicleInfoRouter } from "./routes/vehicle/get-vehicle-info";
 
 const app = express();
 app.set("trust proxy", true);
@@ -41,6 +42,7 @@ app.use(registerVehicleRouter);
 app.use(getUserVehiclesRouter);
 app.use(getVehicleInfoRouter);
 app.use(deleteVehicleRouter);
+app.use(updateVehicleRouter);
 
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();

@@ -14,6 +14,7 @@ import {
 	currentUser,
 	validateRequest,
 } from "@kmalae.ltd/library";
+import mongoose from "mongoose";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -37,9 +38,14 @@ const validateImage = (req: Request, res: Response, next: NextFunction) => {
 };
 
 router.post(
-	"/api/users/registerVehicle",
+	"/api/users/updateVehicle",
 	upload.single("carImage"),
 	[
+		body("vehicleID")
+			.custom((input: string) => {
+				return mongoose.Types.ObjectId.isValid(input);
+			})
+			.withMessage("Invalid vehicle ID"),
 		body("carBrand").notEmpty().withMessage("Car brand must be provided"),
 		body("carModel").notEmpty().withMessage("Car model must be provided"),
 		body("MPG")
@@ -56,33 +62,31 @@ router.post(
 			throw new BadRequestError("User not authenticated");
 		}
 
-		const { carBrand, carModel, MPG } = req.body;
+		const { vehicleID, carBrand, carModel, MPG } = req.body;
+
 		const carImage = req.file;
 		const imageFormat = carImage!.mimetype;
 		const carImageBuffer = fs.readFileSync(
 			path.join("uploads/" + carImage!.filename)
 		) as Buffer;
 
-		const existingUser = await User.findOne({ id: req.currentUser.id });
-		if (!existingUser) {
-			throw new BadRequestError("User does not exist");
-		}
+		const existingVehicle = await Vehicle.findById(vehicleID);
+		if (!existingVehicle) throw new BadRequestError("Vehicle does not exist");
 
-		const newVehicle = Vehicle.build({
-			carBrand,
-			carModel,
-			MPG,
-			carImage: {
-				data: carImageBuffer,
-				contentType: imageFormat,
-			},
-			user: existingUser,
-		});
+		existingVehicle
+			.set({
+				carBrand,
+				carModel,
+				MPG,
+				carImage: {
+					data: carImageBuffer,
+					contentType: imageFormat,
+				},
+			})
+			.save();
 
-		newVehicle.save();
-
-		res.status(200).send(newVehicle);
+		res.status(200).send(existingVehicle);
 	}
 );
 
-export { router as registerVehicleRouter };
+export { router as updateVehicleRouter };
