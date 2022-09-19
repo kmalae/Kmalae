@@ -13,6 +13,7 @@ import { getInfoRouter } from "./routes/user/get-info";
 import { updateInfoRouter } from "./routes/user/update-info";
 import { updatePasswordRouter } from "./routes/user/update-password";
 import { registerVehicleRouter } from "./routes/vehicle/register-vehicle";
+import { getUserVehiclesRouter } from "./routes/vehicle/get-user-vehicles";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
@@ -35,6 +36,7 @@ app.use(getInfoRouter);
 app.use(updateInfoRouter);
 app.use(updatePasswordRouter);
 app.use(registerVehicleRouter);
+app.use(getUserVehiclesRouter);
 
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
