@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: ride-request-depl
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: ride-request
+   template:
+      metadata:
+         labels:
+            app: ride-request
+      spec:
+         containers:
+            - name: ride-request
+              image: kmalae/ride-request
+              env:
+                 - name: MONGO_URL
+                   value: "mongodb+srv://programmer:FTpt8FH8fSxVXS1e@kmalae.muye3x2.mongodb.net/?retryWrites=true&w=majority"
+                 - name: JWT_KEY
+                   valueFrom:
+                      secretKeyRef:
+                         name: jwt-secret
+                         key: JWT_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: ride-request-srv
+spec:
+   selector:
+      app: ride-request
+   ports:
+      - name: ride-request
+        protocol: TCP
+        port: 3000
+        targetPort: 3000

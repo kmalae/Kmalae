@@ -17,3 +17,10 @@ spec:
                       name: auth-srv
                       port:
                          number: 3000
+              - path: /api/ride/?(.*)
+                pathType: Exact
+                backend:
+                   service:
+                      name: ride-request-srv
+                      port:
+                         number: 3000
