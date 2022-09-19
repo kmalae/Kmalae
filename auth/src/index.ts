@@ -17,6 +17,7 @@ import { getUserVehiclesRouter } from "./routes/vehicle/get-user-vehicles";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
+import { getVehicleInfoRouter } from "./routes/vehicle/get-vehicle-info";
 
 const app = express();
 app.set("trust proxy", true);
@@ -37,6 +38,7 @@ app.use(updateInfoRouter);
 app.use(updatePasswordRouter);
 app.use(registerVehicleRouter);
 app.use(getUserVehiclesRouter);
+app.use(getVehicleInfoRouter);
 
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
