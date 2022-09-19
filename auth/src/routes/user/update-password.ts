@@ -17,7 +17,7 @@ interface UserPaylod {
 	email: string;
 }
 
-const router = express();
+const router = express.Router();
 
 router.post(
 	"/api/users/updatePassword",

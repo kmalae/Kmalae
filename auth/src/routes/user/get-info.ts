@@ -6,7 +6,7 @@ import { User } from "../../models/user";
 // importing error-types and middlewares
 import { BadRequestError, currentUser } from "@kmalae.ltd/library";
 
-const router = express();
+const router = express.Router();
 
 router.get(
 	"/api/users/getInfo",

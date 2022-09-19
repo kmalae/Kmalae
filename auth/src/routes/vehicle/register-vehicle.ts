@@ -15,7 +15,7 @@ import {
 	validateRequest,
 } from "@kmalae.ltd/library";
 
-const router = express();
+const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 const validateImage = (req: Request, res: Response, next: NextFunction) => {

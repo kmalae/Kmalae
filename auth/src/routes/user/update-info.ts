@@ -12,7 +12,7 @@ import {
 	validateRequest,
 } from "@kmalae.ltd/library";
 
-const router = express();
+const router = express.Router();
 
 router.post(
 	"/api/users/updateInfo",

@@ -7,7 +7,7 @@ import { Vehicle } from "../../models/vehicle";
 import { BadRequestError, currentUser } from "@kmalae.ltd/library";
 import { User } from "../../models/user";
 
-const router = express();
+const router = express.Router();
 
 router.get(
 	"/api/users/getUserVehicles",

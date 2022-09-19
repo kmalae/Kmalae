@@ -7,7 +7,7 @@ import { User } from "../../models/user";
 // importing error-types and middlewares
 import { BadRequestError, validateRequest } from "@kmalae.ltd/library";
 
-const router = express();
+const router = express.Router();
 
 router.post(
 	"/api/users/signup",
