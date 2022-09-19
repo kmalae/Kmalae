@@ -46,12 +46,6 @@ vehicleSchema.index({ userId: 1 });
 vehicleSchema.set("versionKey", "version");
 vehicleSchema.plugin(updateIfCurrentPlugin);
 
-vehicleSchema.pre("save", function (done) {
-	this.registeredAt = new Date();
-
-	done();
-});
-
 vehicleSchema.statics.build = (attrs: VehicleAttr) => {
 	return new Vehicle(attrs);
 };
