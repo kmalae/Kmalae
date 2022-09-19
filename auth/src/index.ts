@@ -12,6 +12,7 @@ import { signoutRouter } from "./routes/user/signout";
 import { getInfoRouter } from "./routes/user/get-info";
 import { updateInfoRouter } from "./routes/user/update-info";
 import { updatePasswordRouter } from "./routes/user/update-password";
+import { registerVehicleRouter } from "./routes/vehicle/register-vehicle";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
@@ -33,6 +34,7 @@ app.use(signoutRouter);
 app.use(getInfoRouter);
 app.use(updateInfoRouter);
 app.use(updatePasswordRouter);
+app.use(registerVehicleRouter);
 
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
