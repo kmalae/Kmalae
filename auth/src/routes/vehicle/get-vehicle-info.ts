@@ -27,6 +27,7 @@ router.post(
 		if (!req.currentUser) {
 			throw new BadRequestError("User not authenticated");
 		}
+
 		const { vehicleID } = req.body;
 		const { id, email } = req.currentUser;
 
