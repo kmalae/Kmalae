@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { RideRequestStatus } from "@kmalae.ltd/library";
-import { UserDoc } from "../../../auth/src/models/user";
+import { RideRequestStatus, UserDoc } from "@kmalae.ltd/library";
 
 interface RequestAttr {
 	pickUpPoint: {
@@ -12,10 +11,10 @@ interface RequestAttr {
 		lng: string;
 	};
 	timeOfDeparture: Date;
+	user: UserDoc;
 }
 
 export interface RequestDoc extends RequestAttr, mongoose.Document {
-	user: UserDoc;
 	version: number;
 	createdAt: Date;
 }
