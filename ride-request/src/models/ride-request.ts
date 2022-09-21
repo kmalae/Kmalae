@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { RideRequestStatus } from "@kmalae.ltd/library";
 
 interface RequestAttr {
 	pickUpPoint: {
@@ -10,6 +11,7 @@ interface RequestAttr {
 		lng: string;
 	};
 	timeOfDeparture: Date;
+	status: RideRequestStatus;
 }
 
 export interface RequestDoc extends RequestAttr, mongoose.Document {
@@ -26,6 +28,12 @@ const requestSchema = new mongoose.Schema(
 		pickUpPoint: { type: Object, required: true },
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
+		status: {
+			type: String,
+			required: true,
+			enum: Object.values(RideRequestStatus),
+			default: RideRequestStatus.Created,
+		},
 		createdAt: { type: Date, required: true, default: Date.now },
 	},
 	{
