@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { RideRequestStatus } from "@kmalae.ltd/library";
+import { UserDoc } from "../../../auth/src/models/user";
 
 interface RequestAttr {
 	pickUpPoint: {
@@ -15,6 +16,7 @@ interface RequestAttr {
 }
 
 export interface RequestDoc extends RequestAttr, mongoose.Document {
+	user: UserDoc;
 	version: number;
 	createdAt: Date;
 }
@@ -25,6 +27,7 @@ interface RequestModel extends mongoose.Model<RequestDoc> {
 
 const requestSchema = new mongoose.Schema(
 	{
+		user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		pickUpPoint: { type: Object, required: true },
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
