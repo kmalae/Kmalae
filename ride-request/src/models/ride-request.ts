@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-import { RideRequestStatus, UserDoc } from "@kmalae.ltd/library";
+import { UserDoc } from "./user";
+
+import { RideRequestStatus } from "@kmalae.ltd/library";
 
 interface RequestAttr {
 	pickUpPoint: {
@@ -49,7 +51,7 @@ const requestSchema = new mongoose.Schema(
 	}
 );
 
-requestSchema.index({ email: 1 });
+requestSchema.index({ userId: 1 });
 requestSchema.set("versionKey", "version");
 
 requestSchema.statics.build = (attrs: RequestAttr) => {
