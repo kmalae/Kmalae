@@ -50,7 +50,8 @@ router.post(
 		const { id, email } = req.currentUser;
 
 		const existingUser = await User.findOne({
-			userId: id,
+			id,
+			email,
 		});
 
 		if (!existingUser) {
