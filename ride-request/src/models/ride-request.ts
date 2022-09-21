@@ -44,12 +44,12 @@ requestSchema.index({ email: 1 });
 requestSchema.set("versionKey", "version");
 
 requestSchema.statics.build = (attrs: RequestAttr) => {
-	return new Request(attrs);
+	return new RideRequest(attrs);
 };
 
-const Request = mongoose.model<RequestDoc, RequestModel>(
+const RideRequest = mongoose.model<RequestDoc, RequestModel>(
 	"Request",
 	requestSchema
 );
 
-export { Request };
+export { RideRequest };
