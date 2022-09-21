@@ -12,7 +12,9 @@ interface UserModel extends mongoose.Model<UserDoc> {
 
 const userSchema = new mongoose.Schema(
 	{
-		userId: { type: mongoose.Types.ObjectId, required: true },
+		_id: { type: mongoose.Types.ObjectId, required: true },
+		email: { type: String, required: true },
+		version: { type: Number, required: true },
 	},
 	{
 		toJSON: {
@@ -23,6 +25,7 @@ const userSchema = new mongoose.Schema(
 			},
 		},
 		timestamps: { createdAt: false },
+		_id: false,
 	}
 );
 
