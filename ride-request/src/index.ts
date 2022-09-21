@@ -5,7 +5,8 @@ import "express-async-errors";
 import cookieSession from "cookie-session";
 
 // importing routers
-import { createRideRequestRouter } from "./routes/create-ride-request";
+// import { createRideRequestRouter } from "./routes/create-ride-request";
+import { deleteRideRequestRouter } from "./routes/cancel-ride-request";
 
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
@@ -20,7 +21,10 @@ app.use(
 	})
 );
 
-app.use(createRideRequestRouter);
+// app.use(createRideRequestRouter);
+app.use(deleteRideRequestRouter);
+
+
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
 });
