@@ -12,7 +12,6 @@ interface RequestAttr {
 		lng: string;
 	};
 	timeOfDeparture: Date;
-	status: RideRequestStatus;
 }
 
 export interface RequestDoc extends RequestAttr, mongoose.Document {
