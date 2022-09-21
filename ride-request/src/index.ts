@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 import "express-async-errors";
 import cookieSession from "cookie-session";
 
+// importing routers
+import { createRideRequestRouter } from "./routes/create-ride-request";
+
 // importing error-types and middlewares
 import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
 
@@ -17,6 +20,7 @@ app.use(
 	})
 );
 
+app.use(createRideRequestRouter);
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
 });
@@ -29,7 +33,9 @@ app.listen(3000, async () => {
 	if (!process.env.MONGO_URL) throw new Error("MONGO_URI must be defined");
 
 	try {
-		await mongoose.connect(process.env.MONGO_URL);
+		await mongoose.connect(process.env.MONGO_URL, {
+			dbName: "Ride-Request-DB",
+		});
 		console.log("connected to mongodb");
 	} catch (error) {
 		console.error(error);
