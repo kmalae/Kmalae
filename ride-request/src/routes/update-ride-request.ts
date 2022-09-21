@@ -58,7 +58,7 @@ router.post(
 			throw new NotAuthorizedError();
 		}
 
-		const {rideRequestID, pickUpPoint, destination, timeOfDeparture, status } = req.body;
+		const {rideRequestID, pickUpPoint, destination, timeOfDeparture } = req.body;
 		const { id, email } = req.currentUser;
 		const existingUser = await User.findOne({
 			id,
