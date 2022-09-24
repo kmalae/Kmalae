@@ -1,16 +1,15 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-
 // importing error-types and middlewares
 import {
 	BadRequestError,
 	currentUser,
 	validateRequest,
 	RideRequestStatus,
-  LocationType,
+	LocationType,
 	Location,
-	NotAuthorizedError
+	NotAuthorizedError,
 } from "@kmalae.ltd/library";
 import mongoose from "mongoose";
 
@@ -23,7 +22,7 @@ const router = express.Router();
 router.post(
 	"/api/rides/updateRideRequest",
 	[
-    body("rideRequestID")
+		body("rideRequestID")
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
@@ -36,9 +35,9 @@ router.post(
 			.notEmpty()
 			.withMessage("Pick up location must be provided"),
 		body("destination")
-		.custom((input: LocationType) => {
-			return Location(input);
-		})
+			.custom((input: LocationType) => {
+				return Location(input);
+			})
 			.withMessage("Invalid destination location")
 			.notEmpty()
 			.withMessage("Destination location must be provided"),
@@ -49,7 +48,7 @@ router.post(
 			.withMessage("Incorrect departure time format")
 			.exists()
 			.isDate()
-			.withMessage("Departure time must be valid")
+			.withMessage("Departure time must be valid"),
 	],
 	currentUser,
 	validateRequest,
@@ -58,7 +57,8 @@ router.post(
 			throw new NotAuthorizedError();
 		}
 
-		const {rideRequestID, pickUpPoint, destination, timeOfDeparture } = req.body;
+		const { rideRequestID, pickUpPoint, destination, timeOfDeparture } =
+			req.body;
 		const { id, email } = req.currentUser;
 		const existingUser = await User.findOne({
 			id,
@@ -70,17 +70,17 @@ router.post(
 		}
 
 		let existingRideRequest = await RideRequest.findById(rideRequestID);
-		if (!existingRideRequest) throw new BadRequestError("Ride request does not exist");
+		if (!existingRideRequest)
+			throw new BadRequestError("Ride request does not exist");
 
 		existingRideRequest
 			.set({
 				pickUpPoint,
-        destination,
-        timeOfDeparture,
-        status: RideRequestStatus.Updated
+				destination,
+				timeOfDeparture,
+				status: RideRequestStatus.Updated,
 			})
 			.save();
-
 
 		res.status(200).send(existingRideRequest);
 	}
