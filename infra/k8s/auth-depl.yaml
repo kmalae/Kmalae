@@ -16,6 +16,14 @@ spec:
             - name: auth
               image: kmalae/auth
               env:
+                 - name: NATS_CLIENT_ID
+                   valueFrom:
+                     fieldRef:
+                       fieldPath: metadata.name
+                 - name: NATS_URL
+                   value: 'http://nats-srv:4222'
+                 - name: NATS_CLUSTER_ID
+                   value: kmalae
                  - name: MONGO_URL
                    value: "mongodb+srv://programmer:FTpt8FH8fSxVXS1e@kmalae.muye3x2.mongodb.net/?retryWrites=true&w=majority"
                  - name: JWT_KEY
@@ -23,6 +31,9 @@ spec:
                       secretKeyRef:
                          name: jwt-secret
                          key: JWT_KEY
+
+
+
 
 ---
 apiVersion: v1
