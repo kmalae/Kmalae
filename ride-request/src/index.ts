@@ -1,7 +1,10 @@
 import { natsWrapper } from "@kmalae.ltd/library";
 import mongoose from "mongoose";
 import { app } from "./app";
+
+// importing Event listeners
 import { UserRegisteredListener } from "./events/listen/user/user-created-listener";
+import { UserUpdatedListener } from "./events/listen/user/user-updated-listener";
 
 app.listen(3000, async () => {
 	if (!process.env.JWT_KEY) throw new Error("JWT_KEY must be defined");
@@ -40,6 +43,7 @@ app.listen(3000, async () => {
 		process.on("SIGTERM", () => natsWrapper.client.close());
 
 		new UserRegisteredListener(natsWrapper.client).listen();
+		new UserUpdatedListener(natsWrapper.client).listen();
 	} catch (error) {
 		console.error(error);
 	}
