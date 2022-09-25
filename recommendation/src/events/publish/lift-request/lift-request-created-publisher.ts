@@ -4,6 +4,6 @@ import {
 	LiftRequestCreatedEvent,
 } from '@kmalae.ltd/library';
 
-export class LiftRequestCreatdPublisher extends Publisher<LiftRequestCreatedEvent> {
+export class LiftRequestCreatedPublisher extends Publisher<LiftRequestCreatedEvent> {
 	subject: Subjects.LiftRequestCreated = Subjects.LiftRequestCreated;
 }
