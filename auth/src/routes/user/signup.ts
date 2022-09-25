@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import jwt from "jsonwebtoken";
-import { natsWrapper } from "../../nats-wrapper";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models
 import { User } from "../../models/user";

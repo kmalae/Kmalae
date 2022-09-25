@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { natsWrapper } from "../../nats-wrapper";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and services
 import { User } from "../../models/user";

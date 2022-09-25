@@ -3,7 +3,7 @@ import { body, check } from "express-validator";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import { natsWrapper } from "../../nats-wrapper";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and services
 import { User } from "../../models/user";
