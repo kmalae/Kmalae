@@ -15,13 +15,23 @@ interface RequestAttr {
 		lng: string;
 	};
 	timeOfDeparture: Date;
-	user: UserDoc;
+	user: string;
+	version: number;
 }
 
-export interface RequestDoc extends RequestAttr, mongoose.Document {
+export interface RequestDoc extends mongoose.Document {
+	_id: string;
+	pickUpPoint: {
+		lat: string;
+		lng: string;
+	};
+	destination: {
+		lat: string;
+		lng: string;
+	};
+	timeOfDeparture: Date;
+	user: string;
 	version: number;
-	createdAt: Date;
-	status: RideRequestStatus;
 }
 
 interface RequestModel extends mongoose.Model<RequestDoc> {

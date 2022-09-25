@@ -1,25 +1,33 @@
 import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { UserDoc } from "./user";
 
 // importing error-types, middlewares, and types
 import { VehicleStatus } from "@kmalae.ltd/library";
 
 interface VehicleAttr {
+	_id: string;
 	carBrand: string;
 	carModel: string;
 	MPG: number;
-	user: UserDoc;
+	user: string;
 	carImage: {
 		data: Buffer;
 		contentType: string;
 	};
+	version: number;
 }
 
-interface VehicleDoc extends VehicleAttr, mongoose.Document {
-	uploadedAt: Date;
+interface VehicleDoc extends mongoose.Document {
+	_id: string;
+	carBrand: string;
+	carModel: string;
+	MPG: number;
+	user: string;
+	carImage: {
+		data: Buffer;
+		contentType: string;
+	};
 	version: number;
-	status: VehicleStatus;
 }
 
 interface VehicleModel extends mongoose.Model<VehicleDoc> {
@@ -28,6 +36,7 @@ interface VehicleModel extends mongoose.Model<VehicleDoc> {
 
 const vehicleSchema = new mongoose.Schema(
 	{
+		_id: { type: mongoose.Types.ObjectId, required: true },
 		carBrand: { type: String, required: true },
 		carModel: { type: String, required: true },
 		MPG: { type: Number, required: true },
@@ -46,12 +55,15 @@ const vehicleSchema = new mongoose.Schema(
 				ret.id = ret._id;
 				delete ret._id;
 				delete ret.carImage;
+				delete ret.__v;
 			},
 		},
+		timestamps: { createdAt: false },
+		_id: false,
 	}
 );
 
-vehicleSchema.index({ userId: 1 });
+vehicleSchema.index({ _id: 1, user: 1 });
 vehicleSchema.set("versionKey", "version");
 vehicleSchema.plugin(updateIfCurrentPlugin);
 
