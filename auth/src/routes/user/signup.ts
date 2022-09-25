@@ -108,7 +108,7 @@ router.post(
 			});
 			return res.status(201).send(user);
 		} catch (error) {
-			throw new BadRequestError("User not created");
+			throw new BadRequestError("User not registered");
 		}
 	}
 );
