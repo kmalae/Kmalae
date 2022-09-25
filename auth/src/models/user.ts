@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
-import { Password } from "../services/password";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { Password } from '../services/password';
 
 interface UserAttr {
 	email: string;
@@ -48,9 +49,10 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.index({ email: 1 });
-userSchema.set("versionKey", "version");
+userSchema.set('versionKey', 'version');
+userSchema.plugin(updateIfCurrentPlugin);
 
-userSchema.virtual("fullName").get(function (this: UserDoc) {
+userSchema.virtual('fullName').get(function (this: UserDoc) {
 	return `${this.firstName} ${this.lastName}`;
 });
 
@@ -58,15 +60,15 @@ userSchema.statics.build = (attrs: UserAttr) => {
 	return new User(attrs);
 };
 
-userSchema.pre("save", async function (this: UserDoc, done) {
-	if (this.isModified("password")) {
-		const hashed = await Password.toHash(this.get("password"));
-		this.set("password", hashed);
+userSchema.pre('save', async function (this: UserDoc, done) {
+	if (this.isModified('password')) {
+		const hashed = await Password.toHash(this.get('password'));
+		this.set('password', hashed);
 	}
 
 	done();
 });
 
-const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
+const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
 export { User };
