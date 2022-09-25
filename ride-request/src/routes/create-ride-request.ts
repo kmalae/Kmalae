@@ -1,9 +1,9 @@
-import express, { Request, Response } from "express";
-import { body } from "express-validator";
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
 
 // importing models and services
-import { RideRequest } from "../models/ride-request";
-import { User } from "../models/user";
+import { RideRequest } from '../models/ride-request';
+import { User } from '../models/user';
 
 // importing error-types, middlewares, types, and services
 import {
@@ -13,31 +13,35 @@ import {
 	LocationType,
 	Location,
 	BadRequestError,
-} from "@kmalae.ltd/library";
+	natsWrapper,
+} from '@kmalae.ltd/library';
+
+// importing event publishers and listeners
+import { RideRequestCreatdPublisher } from '../events/publish/ride-request/ride-request-created-publisher';
 
 const router = express.Router();
 
 router.post(
-	"/api/rides/createRideRequest",
+	'/api/rides/createRideRequest',
 	[
-		body("pickUpPoint")
+		body('pickUpPoint')
 			.custom((input: LocationType) => {
 				return Location(input);
 			})
-			.withMessage("Invalid pick up location"),
-		body("destination")
+			.withMessage('Invalid pick up location'),
+		body('destination')
 			.custom((input: LocationType) => {
 				return Location(input);
 			})
-			.withMessage("Invalid destination location"),
-		body("timeOfDeparture")
+			.withMessage('Invalid destination location'),
+		body('timeOfDeparture')
 			.notEmpty()
-			.withMessage("Departure time must be provided")
+			.withMessage('Departure time must be provided')
 			.isISO8601()
-			.withMessage("Incorrect departure time format")
+			.withMessage('Incorrect departure time format')
 			.exists()
 			.isDate()
-			.withMessage("Departure time must be valid"),
+			.withMessage('Departure time must be valid'),
 	],
 	currentUser,
 	validateRequest,
@@ -55,7 +59,7 @@ router.post(
 		});
 
 		if (!existingUser) {
-			throw new BadRequestError("User does not exist");
+			throw new BadRequestError('User does not exist');
 		}
 
 		const rideRequest = RideRequest.build({
@@ -65,11 +69,23 @@ router.post(
 			user: existingUser,
 		});
 
-		rideRequest.save();
+		try {
+			await rideRequest.save();
 
-		// publish data here
+			// publishing ride request data
+			new RideRequestCreatdPublisher(natsWrapper.client).publish({
+				id: rideRequest.id,
+				pickUpPoint: rideRequest.pickUpPoint,
+				destination: rideRequest.destination,
+				timeOfDeparture: rideRequest.timeOfDeparture,
+				user: existingUser.id,
+				version: rideRequest.version,
+			});
 
-		res.status(201).send(rideRequest);
+			res.status(201).send(rideRequest);
+		} catch (error) {
+			throw new BadRequestError('Ride request not created');
+		}
 	}
 );
 
