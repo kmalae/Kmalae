@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { UserDoc } from "./user";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { UserDoc } from './user';
 
-import { RideRequestStatus } from "@kmalae.ltd/library";
+import { RideRequestStatus } from '@kmalae.ltd/library';
 
 interface RequestAttr {
 	pickUpPoint: {
@@ -20,6 +20,7 @@ interface RequestAttr {
 export interface RequestDoc extends RequestAttr, mongoose.Document {
 	version: number;
 	createdAt: Date;
+	status: RideRequestStatus;
 }
 
 interface RequestModel extends mongoose.Model<RequestDoc> {
@@ -28,7 +29,7 @@ interface RequestModel extends mongoose.Model<RequestDoc> {
 
 const requestSchema = new mongoose.Schema(
 	{
-		user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 		pickUpPoint: { type: Object, required: true },
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
@@ -54,14 +55,14 @@ const requestSchema = new mongoose.Schema(
 
 requestSchema.index({ userId: 1 });
 requestSchema.plugin(updateIfCurrentPlugin);
-requestSchema.set("versionKey", "version");
+requestSchema.set('versionKey', 'version');
 
 requestSchema.statics.build = (attrs: RequestAttr) => {
 	return new RideRequest(attrs);
 };
 
 const RideRequest = mongoose.model<RequestDoc, RequestModel>(
-	"Request",
+	'Request',
 	requestSchema
 );
 
