@@ -2,3 +2,4 @@ node_modules
 JWT-secret-key.yaml
 library
 
+auth
