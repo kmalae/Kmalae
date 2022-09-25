@@ -29,7 +29,7 @@ export class UserRegisteredListener extends Listener<UserRegisteredEvent> {
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("User not created: Ride-Request");
+			throw new BadRequestError("User not created: Recomm");
 		}
 	}
 }

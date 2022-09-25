@@ -18,7 +18,7 @@ export class VehicleRegisteredListener extends Listener<VehicleRegisteredEvent> 
 		const { id, carBrand, carModel, MPG, carImage, user, version } = data;
 
 		const vehicle = Vehicle.build({
-			id,
+			_id: id,
 			carBrand,
 			carModel,
 			MPG,
