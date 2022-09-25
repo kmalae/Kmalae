@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import { natsWrapper } from "@kmalae.ltd/library";
+import jwt from "jsonwebtoken";
 
 // importing models and services
 import { User } from "../../models/user";
@@ -79,6 +80,20 @@ router.post(
 
 		try {
 			await existingUser.save();
+
+			// Generate JWT
+			const userJwt = jwt.sign(
+				{
+					id: existingUser.id,
+					email: existingUser.email,
+				},
+				process.env.JWT_KEY!
+			);
+
+			// Store JWT on session object
+			req.session = {
+				jwt: userJwt,
+			};
 
 			//publishing user data
 			new UserUpdatedPublisher(natsWrapper.client).publish({

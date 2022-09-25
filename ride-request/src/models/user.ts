@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 
 interface UserAttr {
-	userId: string;
+	_id: string;
+	email: string;
+	version: number;
 }
 
-export interface UserDoc extends UserAttr, mongoose.Document {}
+export interface UserDoc extends mongoose.Document {
+	_id: string;
+	email: string;
+	version: string;
+}
 
 interface UserModel extends mongoose.Model<UserDoc> {
 	build(attr: UserAttr): UserDoc;
@@ -29,7 +35,7 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
-userSchema.index({ userId: 1 });
+userSchema.index({ id: 1, email: 1 });
 
 userSchema.statics.build = (attrs: UserAttr) => {
 	return new User(attrs);
