@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recomm-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation
+  template:
+    metadata:
+      labels:
+        app: recommendation
+    spec:
+      containers:
+        - name: recommendation
+          image: kmalae/recommendation
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: kmalae
+            - name: MONGO_URL
+              value: 'mongodb+srv://programmer:FTpt8FH8fSxVXS1e@kmalae.muye3x2.mongodb.net/?retryWrites=true&w=majority'
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendation-srv
+spec:
+  selector:
+    app: recommendation
+  ports:
+    - name: recommendation
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
