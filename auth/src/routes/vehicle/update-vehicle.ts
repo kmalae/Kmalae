@@ -1,8 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
-import { body, check } from "express-validator";
+import { body } from "express-validator";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and services
 import { User } from "../../models/user";
@@ -14,6 +15,10 @@ import {
 	currentUser,
 	validateRequest,
 } from "@kmalae.ltd/library";
+
+// importing event publishers and listeners
+import { VehicleUpdatedPublisher } from "../../events/publish/vehicle/vehicle-updated-publisher";
+
 import mongoose from "mongoose";
 
 const router = express.Router();
@@ -62,6 +67,11 @@ router.post(
 			throw new BadRequestError("User not authenticated");
 		}
 
+		const existingUser = await User.findOne({ id: req.currentUser.id });
+		if (!existingUser) {
+			throw new BadRequestError("User does not exist");
+		}
+
 		const { vehicleID, carBrand, carModel, MPG } = req.body;
 
 		const carImage = req.file;
@@ -73,19 +83,37 @@ router.post(
 		const existingVehicle = await Vehicle.findById(vehicleID);
 		if (!existingVehicle) throw new BadRequestError("Vehicle does not exist");
 
-		existingVehicle
-			.set({
-				carBrand,
-				carModel,
-				MPG,
-				carImage: {
-					data: carImageBuffer,
-					contentType: imageFormat,
-				},
-			})
-			.save();
+		existingVehicle.set({
+			carBrand,
+			carModel,
+			MPG,
+			carImage: {
+				data: carImageBuffer,
+				contentType: imageFormat,
+			},
+		});
 
-		res.status(200).send(existingVehicle);
+		try {
+			await existingVehicle.save();
+
+			// publishing udpated vehicle data
+			new VehicleUpdatedPublisher(natsWrapper.client).publish({
+				id: existingVehicle.id,
+				carBrand: existingVehicle.carBrand,
+				carModel: existingVehicle.carModel,
+				MPG: existingVehicle.MPG,
+				user: existingUser.id,
+				carImage: {
+					data: existingVehicle.carImage.data,
+					contentType: existingVehicle.carImage.contentType,
+				},
+				version: existingVehicle.version,
+			});
+
+			res.status(200).send(existingVehicle);
+		} catch (error) {
+			throw new BadRequestError("Vehicle not updated");
+		}
 	}
 );
 
