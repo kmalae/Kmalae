@@ -15,6 +15,7 @@ export interface UserDoc extends UserAttr, mongoose.Document {
 	fullName: string;
 	createdAt: Date;
 	passwordLastUpdatedAt?: Date;
+	version: number;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -47,6 +48,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.index({ email: 1 });
+userSchema.set("versionKey", "version");
 
 userSchema.virtual("fullName").get(function (this: UserDoc) {
 	return `${this.firstName} ${this.lastName}`;
