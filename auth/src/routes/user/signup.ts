@@ -1,11 +1,14 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 import jwt from "jsonwebtoken";
+import { natsWrapper } from "@kmalae.ltd/library";
+
 // importing models
 import { User } from "../../models/user";
 
 // importing error-types and middlewares
 import { BadRequestError, validateRequest } from "@kmalae.ltd/library";
+import { UserRegisteredPublisher } from "../../events/publish/user/user-registered-publisher";
 
 const router = express.Router();
 
@@ -64,6 +67,7 @@ router.post(
 			dateOfBirth,
 			phoneNumber,
 		} = req.body;
+
 		const existingUser = await User.findOne({ email });
 		if (existingUser) {
 			throw new BadRequestError("Email already exists");
@@ -78,23 +82,34 @@ router.post(
 			dateOfBirth,
 			phoneNumber,
 		});
-		user.save();
 
-		// Generate JWT
-		const userJwt = jwt.sign(
-			{
+		try {
+			await user.save();
+
+			// Generate JWT
+			const userJwt = jwt.sign(
+				{
+					id: user.id,
+					email: user.email,
+				},
+				process.env.JWT_KEY!
+			);
+
+			// Store JWT on session object
+			req.session = {
+				jwt: userJwt,
+			};
+
+			//publishing user data
+			new UserRegisteredPublisher(natsWrapper.client).publish({
 				id: user.id,
 				email: user.email,
-			},
-			process.env.JWT_KEY!
-		);
-
-		// Store JWT on session object
-		req.session = {
-			jwt: userJwt,
-		};
-
-		res.status(201).send(user);
+				version: user.version,
+			});
+			return res.status(201).send(user);
+		} catch (error) {
+			throw new BadRequestError("User not registered");
+		}
 	}
 );
 

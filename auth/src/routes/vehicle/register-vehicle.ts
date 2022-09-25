@@ -3,6 +3,7 @@ import { body, check } from "express-validator";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and services
 import { User } from "../../models/user";
@@ -14,6 +15,9 @@ import {
 	currentUser,
 	validateRequest,
 } from "@kmalae.ltd/library";
+
+// importing event publishers and listeners
+import { VehicleRegisteredPublisher } from "../../events/publish/vehicle/vehicle-registered-publisher";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -78,10 +82,26 @@ router.post(
 			},
 			user: existingUser,
 		});
+		try {
+			await newVehicle.save();
 
-		newVehicle.save();
-
-		res.status(200).send(newVehicle);
+			//publishing vehicle data
+			new VehicleRegisteredPublisher(natsWrapper.client).publish({
+				id: newVehicle.id,
+				carBrand: newVehicle.carBrand,
+				carModel: newVehicle.carModel,
+				user: existingUser.id,
+				MPG: newVehicle.MPG,
+				carImage: {
+					data: newVehicle.carImage.data,
+					contentType: newVehicle.carImage.contentType,
+				},
+				version: newVehicle.version,
+			});
+			res.status(200).send(newVehicle);
+		} catch (error) {
+			throw new BadRequestError("Vehicle not registered");
+		}
 	}
 );
 

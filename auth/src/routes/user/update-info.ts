@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
-import jwt from "jsonwebtoken";
+import { body } from "express-validator";
+import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and services
-import { User, UserDoc } from "../../models/user";
+import { User } from "../../models/user";
 
 // importing error-types and middlewares
 import {
@@ -11,6 +11,9 @@ import {
 	currentUser,
 	validateRequest,
 } from "@kmalae.ltd/library";
+
+// importing event publishers and listeners
+import { UserUpdatedPublisher } from "../../events/publish/user/user-updated-publisher";
 
 const router = express.Router();
 
@@ -65,18 +68,29 @@ router.post(
 		const existingUser = await User.findById(req.currentUser.id);
 		if (!existingUser) throw new BadRequestError("User does not exist");
 
-		existingUser
-			.set({
-				email,
-				firstName,
-				lastName,
-				IDNumber,
-				dateOfBirth,
-				phoneNumber,
-			})
-			.save();
+		existingUser.set({
+			email,
+			firstName,
+			lastName,
+			IDNumber,
+			dateOfBirth,
+			phoneNumber,
+		});
 
-		res.status(200).send(existingUser);
+		try {
+			await existingUser.save();
+
+			//publishing user data
+			new UserUpdatedPublisher(natsWrapper.client).publish({
+				id: existingUser.id,
+				email: existingUser.email,
+				version: existingUser.version,
+			});
+
+			return res.status(201).send(existingUser);
+		} catch (error) {
+			throw new BadRequestError("User not updated");
+		}
 	}
 );
 
