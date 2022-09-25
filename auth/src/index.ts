@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { natsWrapper } from "./nats-wrapper";
+import { natsWrapper } from "@kmalae.ltd/library";
 import { app } from "./app";
 
 app.listen(3000, async () => {
