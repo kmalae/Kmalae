@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { UserDoc } from "./user";
 
+// importing error-types, middlewares, and types
+import { VehicleStatus } from "@kmalae.ltd/library";
+
 interface VehicleAttr {
 	carBrand: string;
 	carModel: string;
@@ -16,6 +19,7 @@ interface VehicleAttr {
 interface VehicleDoc extends VehicleAttr, mongoose.Document {
 	uploadedAt: Date;
 	version: number;
+	status: VehicleStatus;
 }
 
 interface VehicleModel extends mongoose.Model<VehicleDoc> {
@@ -30,6 +34,12 @@ const vehicleSchema = new mongoose.Schema(
 		registeredAt: { type: Date, required: true, default: Date.now },
 		user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 		carImage: { type: Object, required: true },
+		status: {
+			type: String,
+			required: true,
+			enum: Object.values(VehicleStatus),
+			default: VehicleStatus.Active,
+		},
 	},
 	{
 		toJSON: {
