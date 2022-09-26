@@ -15,10 +15,11 @@ export class RideRequestUpdatedListener extends Listener<RideRequestUpdatedEvent
 	async onMessage(data: RideRequestUpdatedEvent["data"], msg: Message) {
 		const { id, pickUpPoint, destination, timeOfDeparture, user, version } =
 			data;
-
+		
+		const previousVersion = version - 1;
 		const existingRideRequest = await RideRequest.findOne({
 			_id: id,
-			version: version - 1,
+			version: previousVersion,
 		});
 
 		if (!existingRideRequest) {
@@ -31,7 +32,6 @@ export class RideRequestUpdatedListener extends Listener<RideRequestUpdatedEvent
 			destination,
 			timeOfDeparture,
 			user,
-			version,
 		});
 
 		try {
