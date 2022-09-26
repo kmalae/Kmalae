@@ -1,26 +1,33 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-   name: ingress-service
-   annotations:
-      kubernetes.io/ingress.class: nginx
-      nginx.ingress.kubernetes.io/use-regex: "true"
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
-   rules:
-      - host: kmalae.com
-        http:
-           paths:
-              - path: /api/users/?(.*)
-                pathType: Exact
-                backend:
-                   service:
-                      name: auth-srv
-                      port:
-                         number: 3000
-              - path: /api/rides/?(.*)
-                pathType: Exact
-                backend:
-                   service:
-                      name: ride-request-srv
-                      port:
-                         number: 3000
+  rules:
+    - host: kmalae.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Exact
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 3000
+          - path: /api/rides/?(.*)
+            pathType: Exact
+            backend:
+              service:
+                name: ride-request-srv
+                port:
+                  number: 3000
+          - path: /api/recomm/?(.*)
+            pathType: Exact
+            backend:
+              service:
+                name: recommendation-srv
+                port:
+                  number: 3000
