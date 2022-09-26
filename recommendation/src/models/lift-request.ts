@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { UserDoc } from './user';
+import { VehicleDoc } from './vehicle';
 
 import { LiftRequestStatus, LocationType } from '@kmalae.ltd/library';
 
@@ -9,6 +10,7 @@ interface LiftRequestAttr {
 	destination: LocationType;
 	timeOfDeparture: Date;
 	user: UserDoc;
+	vehicle: VehicleDoc;
 }
 
 export interface LiftRequestDoc extends LiftRequestAttr, mongoose.Document {
@@ -24,6 +26,7 @@ interface LiftRequestModel extends mongoose.Model<LiftRequestDoc> {
 const liftRequestSchema = new mongoose.Schema(
 	{
 		user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+		vehicle: { type: mongoose.Types.ObjectId, required: true, ref: 'Vehicle' },
 		currentLocation: { type: Object, required: true },
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
@@ -47,7 +50,7 @@ const liftRequestSchema = new mongoose.Schema(
 	}
 );
 
-liftRequestSchema.index({ userId: 1 });
+liftRequestSchema.index({ user: 1, vehicle: 1 });
 liftRequestSchema.plugin(updateIfCurrentPlugin);
 liftRequestSchema.set('versionKey', 'version');
 
