@@ -17,13 +17,14 @@ export class UserUpdatedListener extends Listener<UserUpdatedEvent> {
 	async onMessage(data: UserUpdatedEvent["data"], msg: Message) {
 		const { id, email, version } = data;
 
-		const user = await User.findOne({ id, version: version - 1 });
+		const previousVersion = version - 1;
+		const user = await User.findOne({ id, version: previousVersion });
 
 		if (!user) {
 			throw new BadRequestError("User not found");
 		}
 
-		user.set({ email, version });
+		user.set({ email });
 		try {
 			await user.save();
 			msg.ack();
