@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { UserDoc } from "./user";
 
-import { RideRequestStatus } from "@kmalae.ltd/library";
+import { LocationType, RideRequestStatus } from "@kmalae.ltd/library";
 
 interface RequestAttr {
 	_id: string;
@@ -36,6 +36,11 @@ export interface RequestDoc extends mongoose.Document {
 
 interface RequestModel extends mongoose.Model<RequestDoc> {
 	build(attr: RequestAttr): RequestDoc;
+	getAcceptableCoordinates(
+		coordinate: LocationType,
+		timeOfDeparture: Date,
+		radius: number
+	): Promise<RequestDoc | null>;
 }
 
 const requestSchema = new mongoose.Schema(
@@ -71,6 +76,53 @@ requestSchema.set("versionKey", "version");
 
 requestSchema.statics.build = (attrs: RequestAttr) => {
 	return new RideRequest(attrs);
+};
+
+requestSchema.statics.getAcceptableCoordinates = async (
+	coordinate,
+	radius: number,
+	timeOfDeparture: Date
+) => {
+	const tmpTimeOfDeparture = new Date(timeOfDeparture);
+	let currentTime = new Date();
+	let timeDiff = 5;
+
+	if (
+		timeOfDeparture.getDate() === currentTime.getDate() &&
+		timeOfDeparture.getHours() === currentTime.getHours()
+	) {
+		timeDiff = timeOfDeparture.getMinutes() - currentTime.getMinutes();
+	}
+
+	const bufferTime = timeDiff <= 5 ? timeDiff : 5;
+
+	let futureBuffer = timeOfDeparture.setMinutes(
+		tmpTimeOfDeparture.getMinutes() + bufferTime
+	);
+	let priorBuffer = tmpTimeOfDeparture.setMinutes(
+		tmpTimeOfDeparture.getMinutes() - bufferTime
+	);
+
+	const upperLat = `${parseFloat(coordinate.lat) + radius * 0.0090437173}`;
+	const lowerLat = `${parseFloat(coordinate.lat) - radius * 0.0090437173}`;
+	const upperLng = `${
+		parseFloat(coordinate.lng) -
+		(radius * 1) / (111.32 * Math.cos(parseFloat(coordinate.lat)))
+	}`;
+	const lowerLng = `${
+		parseFloat(coordinate.lng) +
+		(radius * 1) / (111.32 * Math.cos(parseFloat(coordinate.lat)))
+	}`;
+
+	return RideRequest.find()
+		.where("timeOfDeparture")
+		.gte(priorBuffer)
+		.where("timeOfDeparture")
+		.lte(futureBuffer)
+		.lte("destination.lat", upperLat)
+		.gte("destination.lat", lowerLat)
+		.lte("destination.lng", upperLng)
+		.gte("destination.lng", lowerLng);
 };
 
 const RideRequest = mongoose.model<RequestDoc, RequestModel>(
