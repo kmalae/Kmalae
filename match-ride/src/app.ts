@@ -8,6 +8,7 @@ import { errorHandler, NotFoundError } from "@kmalae.ltd/library";
 
 // importing routers
 import { createMatchRequestRouter } from "./routes/create-match-request";
+import { cancelMatchRequestRouter } from "./routes/driver-cancel-request";
 
 const app = express();
 app.set("trust proxy", true);
@@ -20,6 +21,7 @@ app.use(
 );
 
 app.use(createMatchRequestRouter);
+app.use(cancelMatchRequestRouter);
 
 app.all("*", async (req, res, next) => {
 	throw new NotFoundError();
