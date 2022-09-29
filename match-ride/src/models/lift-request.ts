@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { UserDoc } from "./user";
-import { VehicleDoc } from "./vehicle";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { UserDoc } from './user';
+import { VehicleDoc } from './vehicle';
 
-import { LiftRequestStatus, LocationType } from "@kmalae.ltd/library";
+import { LiftRequestStatus, LocationType } from '@kmalae.ltd/library';
 
 interface LiftRequestAttr {
 	_id: string;
 	currentLocation: LocationType;
 	destination: LocationType;
 	timeOfDeparture: Date;
-	user: UserDoc;
-	vehicle: VehicleDoc;
+	user: string;
+	vehicle: string;
 	version: number;
 }
 
@@ -20,8 +20,8 @@ export interface LiftRequestDoc extends LiftRequestAttr, mongoose.Document {
 	currentLocation: LocationType;
 	destination: LocationType;
 	timeOfDeparture: Date;
-	user: UserDoc;
-	vehicle: VehicleDoc;
+	user: string;
+	vehicle: string;
 	version: number;
 }
 
@@ -32,11 +32,11 @@ interface LiftRequestModel extends mongoose.Model<LiftRequestDoc> {
 const liftRequestSchema = new mongoose.Schema(
 	{
 		_id: { type: mongoose.Types.ObjectId, required: true },
-		user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 		vehicle: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: "Vehicle",
+			ref: 'Vehicle',
 		},
 		currentLocation: { type: Object, required: true },
 		destination: { type: Object, required: true },
@@ -64,14 +64,14 @@ const liftRequestSchema = new mongoose.Schema(
 
 liftRequestSchema.index({ _id: 1, user: 1, vehicle: 1 });
 liftRequestSchema.plugin(updateIfCurrentPlugin);
-liftRequestSchema.set("versionKey", "version");
+liftRequestSchema.set('versionKey', 'version');
 
 liftRequestSchema.statics.build = (attrs: LiftRequestAttr) => {
 	return new LiftRequest(attrs);
 };
 
 const LiftRequest = mongoose.model<LiftRequestDoc, LiftRequestModel>(
-	"Lift",
+	'Lift',
 	liftRequestSchema
 );
 
