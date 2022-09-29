@@ -21,12 +21,14 @@ export class UserUpdatedListener extends Listener<UserUpdatedEvent> {
 		const user = await User.findOne({ id, version: previousVersion });
 
 		if (!user) {
-			throw new BadRequestError("User not found");
+			throw new BadRequestError("User not found: Recomm");
 		}
 
 		user.set({ email });
+
 		try {
 			await user.save();
+
 			msg.ack();
 		} catch (error) {
 			throw new BadRequestError("User not updated: Recomm");
