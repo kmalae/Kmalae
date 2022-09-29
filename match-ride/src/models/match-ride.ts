@@ -54,7 +54,6 @@ const MatchRideSchema = new mongoose.Schema(
 			required: false,
 			enum: Object.values(WhoCancelled),
 		},
-		version: { type: Number, required: true },
 	},
 	{
 		toJSON: {
@@ -65,7 +64,6 @@ const MatchRideSchema = new mongoose.Schema(
 			},
 		},
 		timestamps: { createdAt: false },
-		_id: false,
 	}
 );
 
