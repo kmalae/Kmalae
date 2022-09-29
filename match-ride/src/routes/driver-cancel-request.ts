@@ -27,7 +27,7 @@ router.delete(
 	[
 		body('matchRequestID')
 			.notEmpty()
-			.withMessage('match ride ID must be provided')
+			.withMessage('Match request ID must be provided')
 			.custom((value) => mongoose.Types.ObjectId.isValid(value))
 			.withMessage('Invalid match ride request ID'),
 	],
@@ -37,6 +37,7 @@ router.delete(
 		if (!req.currentUser) {
 			throw new NotAuthorizedError();
 		}
+
 		const { matchRequestID } = req.body;
 
 		const { id, email } = req.currentUser;
@@ -52,13 +53,14 @@ router.delete(
 		const existingMatchRide = await MatchRide.findById(matchRequestID);
 
 		if (!existingMatchRide) {
-			throw new BadRequestError('Match Ride does not exist');
+			throw new BadRequestError('Match request does not exist');
 		}
-		if(existingMatchRide.status === MatchRideStatus.Requested){
 
-			existingMatchRide.set({ status: MatchRideStatus.Cancelled, WhoCancelled: WhoCancelled.Driver});
+		if(existingMatchRide.status !== MatchRideStatus.Requested){
+			throw new BadRequestError("Driver cannot cancel")
 		}
-	
+
+		existingMatchRide.set({ status: MatchRideStatus.Cancelled, whoCancelled: WhoCancelled.Driver});
 
 		try {
 			await existingMatchRide.save();
@@ -72,7 +74,7 @@ router.delete(
 		
 			res.status(200).send(existingMatchRide);
 		} catch (error) {
-			throw new BadRequestError('Matched Ride not cancelled');
+			throw new BadRequestError('Matched request not cancelled');
 		}
 	}
 );
