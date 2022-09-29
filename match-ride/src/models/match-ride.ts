@@ -49,10 +49,11 @@ const MatchRideSchema = new mongoose.Schema(
 			default: MatchRideStatus.Requested,
 		},
 		createdAt: { type: Date, required: true, default: Date.now },
-		WhoCancelled: {
+		whoCancelled: {
 			type: String,
-			required: false,
+			required: true,
 			enum: Object.values(WhoCancelled),
+			default: WhoCancelled.None, 
 		},
 	},
 	{
