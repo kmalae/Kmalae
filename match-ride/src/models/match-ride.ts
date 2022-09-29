@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { LocationType, MatchRideStatus } from "@kmalae.ltd/library";
+import {
+	LocationType,
+	MatchRideStatus,
+	WhoCancelled,
+} from "@kmalae.ltd/library";
 
 interface MatchRideAttr {
 	passenger: string;
@@ -13,6 +17,8 @@ interface MatchRideAttr {
 
 export interface MatchRideDoc extends mongoose.Document {
 	status: MatchRideStatus;
+	createdAt: Date;
+	whoCancelled: WhoCancelled;
 	version: number;
 }
 
@@ -22,17 +28,31 @@ interface MatchRideModel extends mongoose.Model<MatchRideDoc> {
 
 const MatchRideSchema = new mongoose.Schema(
 	{
-		passenger: { type: mongoose.Types.ObjectId, required: true },
-		driver: { type: mongoose.Types.ObjectId, required: true },
-		ride: { type: mongoose.Types.ObjectId, required: true },
-		vehicle: { type: mongoose.Types.ObjectId, required: true },
+		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		ride: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: "RideRequest",
+		},
+		vehicle: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: "Vehicle",
+		},
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
 		status: {
 			type: String,
 			required: true,
 			enum: Object.values(MatchRideStatus),
-			default: MatchRideStatus.requested,
+			default: MatchRideStatus.Requested,
+		},
+		createdAt: { type: Date, required: true, default: Date.now },
+		WhoCancelled: {
+			type: String,
+			required: false,
+			enum: Object.values(WhoCancelled),
 		},
 		version: { type: Number, required: true },
 	},

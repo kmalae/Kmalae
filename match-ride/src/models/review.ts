@@ -32,9 +32,13 @@ interface ReviewModel extends mongoose.Model<ReviewDoc> {
 const reviewSchema = new mongoose.Schema(
 	{
 		_id: { type: mongoose.Types.ObjectId, required: true },
-		passenger: { type: mongoose.Types.ObjectId, required: true },
-		driver: { type: mongoose.Types.ObjectId, required: true },
-		ride: { type: mongoose.Types.ObjectId, required: true },
+		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		ride: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: "RideRequest",
+		},
 		passengerRated: { type: Number, required: true },
 		passengerCommented: { type: String, required: true },
 		driverRated: { type: Number, required: true },
