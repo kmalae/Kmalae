@@ -4,3 +4,5 @@ library
 
 auth
 ride-request
+recommendation
+MobileClient

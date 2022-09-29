@@ -1,34 +1,42 @@
 apiVersion: skaffold/v2alpha3
 kind: Config
 deploy:
-  kubectl:
-    manifests:
-      - ./infra/k8s/*
+   kubectl:
+      manifests:
+         - ./infra/k8s/*
 build:
-  local:
-    push: false
-  artifacts:
-    - image: kmalae/auth
-      context: auth
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: 'src/**/*.ts'
-            dest: .
-    - image: kmalae/ride-request
-      context: ride-request
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: 'src/**/*.ts'
-            dest: .
-    - image: kmalae/recommendation
-      context: recommendation
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: 'src/**/*.ts'
-            dest: .
+   local:
+      push: false
+   artifacts:
+      - image: kmalae/auth
+        context: auth
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
+      - image: kmalae/ride-request
+        context: ride-request
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
+      - image: kmalae/recommendation
+        context: recommendation
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
+      - image: kmalae/match-ride
+        context: match-ride
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
