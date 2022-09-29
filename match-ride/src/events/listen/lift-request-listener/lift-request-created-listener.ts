@@ -3,16 +3,16 @@ import {
 	Subjects,
 	LiftRequestCreatedEvent,
 	BadRequestError,
-} from '@kmalae.ltd/library';
-import { Message } from 'node-nats-streaming';
-import { LiftRequest } from '../../../models/lift-request';
-import { queueGroupName } from '../queue-group-name';
+} from "@kmalae.ltd/library";
+import { Message } from "node-nats-streaming";
+import { LiftRequest } from "../../../models/lift-request";
+import { queueGroupName } from "../queue-group-name";
 
 export class LiftRequestCreatedListener extends Listener<LiftRequestCreatedEvent> {
 	subject: Subjects.LiftRequestCreated = Subjects.LiftRequestCreated;
 	queueGroupName = queueGroupName;
 
-	async onMessage(data: LiftRequestCreatedEvent['data'], msg: Message) {
+	async onMessage(data: LiftRequestCreatedEvent["data"], msg: Message) {
 		const {
 			id,
 			user,
@@ -39,7 +39,7 @@ export class LiftRequestCreatedListener extends Listener<LiftRequestCreatedEvent
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError('Lift request not updated: Match');
+			throw new BadRequestError("Lift request not created: Match");
 		}
 	}
 }

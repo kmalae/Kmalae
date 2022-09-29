@@ -16,6 +16,11 @@ import { RideRequestCreatedListener } from "./events/listen/ride-request-listene
 import { RideRequestUpdatedListener } from "./events/listen/ride-request-listener/ride-request-updated-listener";
 import { RideRequestCancelledListener } from "./events/listen/ride-request-listener/ride-request-cancelled-listener";
 
+// importing Lift-Request event listeners
+import { LiftRequestCreatedListener } from "./events/listen/lift-request-listener/lift-request-created-listener";
+import { LiftRequestUpdatedListener } from "./events/listen/lift-request-listener/lift-request-updated-listener";
+import { LiftRequestCancelledListener } from "./events/listen/lift-request-listener/lift-request-cancelled-listener";
+
 app.listen(3000, async () => {
 	if (!process.env.JWT_KEY) throw new Error("JWT_KEY must be defined");
 
@@ -35,7 +40,7 @@ app.listen(3000, async () => {
 
 	try {
 		await mongoose.connect(process.env.MONGO_URL, {
-			dbName: "Recommendation-DB",
+			dbName: "Match-Ride-DB",
 		});
 		console.log("connected to mongodb");
 		await natsWrapper.connect(
@@ -65,6 +70,11 @@ app.listen(3000, async () => {
 		new RideRequestCreatedListener(natsWrapper.client).listen();
 		new RideRequestUpdatedListener(natsWrapper.client).listen();
 		new RideRequestCancelledListener(natsWrapper.client).listen();
+
+		// Listening to Ride-Request changes
+		new LiftRequestCreatedListener(natsWrapper.client).listen();
+		new LiftRequestUpdatedListener(natsWrapper.client).listen();
+		new LiftRequestCancelledListener(natsWrapper.client).listen();
 	} catch (error) {
 		console.error(error);
 	}
