@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { UserDoc } from "./user";
 
 import { LocationType, RideRequestStatus } from "@kmalae.ltd/library";
 
@@ -71,8 +70,8 @@ const requestSchema = new mongoose.Schema(
 );
 
 requestSchema.index({ _id: 1, user: 1 });
-requestSchema.plugin(updateIfCurrentPlugin);
 requestSchema.set("versionKey", "version");
+requestSchema.plugin(updateIfCurrentPlugin);
 
 requestSchema.statics.build = (attrs: RequestAttr) => {
 	return new RideRequest(attrs);
