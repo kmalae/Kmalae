@@ -4,14 +4,10 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 interface ReviewAttr {
 	passenger: string;
 	driver: string;
-	rideRequest: string;
-	liftRequest: string;
-	matchRide: string;
-	passengerRated: number;
-	passengerCommented: string;
-	driverRated: number;
-	driverCommented: string;
-	version: number;
+	passengerRated?: number;
+	passengerCommented?: string;
+	driverRated?: number;
+	driverCommented?: string;
 }
 
 export interface ReviewDoc extends ReviewAttr, mongoose.Document {
@@ -26,25 +22,10 @@ const reviewSchema = new mongoose.Schema(
 	{
 		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-		rideRequest: {
-			type: mongoose.Types.ObjectId,
-			required: true,
-			ref: "RideRequest",
-		},
-		liftRequest: {
-			type: mongoose.Types.ObjectId,
-			required: true,
-			ref: "LiftRequest",
-		},
-		matchRide: {
-			type: mongoose.Types.ObjectId,
-			required: true,
-			ref: "MatchRide",
-		},
-		passengerRated: { type: Number, required: true },
-		passengerCommented: { type: String, required: true },
-		driverRated: { type: Number, required: true },
-		driverCommented: { type: String, required: true },
+		passengerRated: { type: Number, required: false },
+		passengerCommented: { type: String, required: false },
+		driverRated: { type: Number, required: false },
+		driverCommented: { type: String, required: false },
 	},
 	{
 		toJSON: {
