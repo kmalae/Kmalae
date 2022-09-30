@@ -4,7 +4,9 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 interface ReviewAttr {
 	passenger: string;
 	driver: string;
-	ride: string;
+	rideRequest: string;
+	liftRequest: string;
+	matchRide: string;
 	passengerRated: number;
 	passengerCommented: string;
 	driverRated: number;
