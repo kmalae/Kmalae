@@ -38,3 +38,10 @@ spec:
                       name: match-ride-srv
                       port:
                          number: 3000
+              - path: /api/review/?(.*)
+                pathType: Exact
+                backend:
+                   service:
+                      name: review-srv
+                      port:
+                         number: 3000
