@@ -1,10 +1,10 @@
-import express, { Request, Response } from "express";
-import { body } from "express-validator";
-import mongoose from "mongoose";
-import { natsWrapper } from "@kmalae.ltd/library";
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import mongoose from 'mongoose';
+import { natsWrapper } from '@kmalae.ltd/library';
 
 // importing models and service
-import { MatchRide } from "../models/match-ride";
+import { MatchRide } from '../models/match-ride';
 
 // importing error-types, middle, and types
 import {
@@ -14,49 +14,50 @@ import {
 	BadRequestError,
 	NotAuthorizedError,
 	currentUser,
-} from "@kmalae.ltd/library";
+} from '@kmalae.ltd/library';
 
 // importing event publishers and listeners
-import { MatchRideCreatedPublisher } from "../events/publish/match-ride/match-ride-created-publisher";
+import { MatchRideCreatedPublisher } from '../events/publish/match-ride/match-ride-created-publisher';
+import { User } from '../models/user';
 
 const router = express.Router();
 
 router.post(
-	"/api/match/createMatchRequest",
+	'/api/match/createMatchRequest',
 	[
-		body("passengerID")
+		body('passengerID')
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
-			.withMessage("Invalid passenger ID"),
-		body("driverID")
+			.withMessage('Invalid passenger ID'),
+		body('driverID')
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
-			.withMessage("Invalid driver ID"),
+			.withMessage('Invalid driver ID'),
 
-		body("rideRequestID")
+		body('rideRequestID')
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
-			.withMessage("Invalid ride request ID"),
-		body("vehicleID")
+			.withMessage('Invalid ride request ID'),
+		body('vehicleID')
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
-			.withMessage("Invalid vehicle ID"),
-		body("destination")
+			.withMessage('Invalid vehicle ID'),
+		body('destination')
 			.custom((input: LocationType) => {
 				return Location(input);
 			})
-			.withMessage("Invalid destination location"),
-		body("timeOfDeparture")
+			.withMessage('Invalid destination location'),
+		body('timeOfDeparture')
 			.notEmpty()
-			.withMessage("Departure time must be provided")
+			.withMessage('Departure time must be provided')
 			.isISO8601()
-			.withMessage("Incorrect departure time format")
+			.withMessage('Incorrect departure time format')
 			.exists()
-			.withMessage("Departure time must be valid"),
+			.withMessage('Departure time must be valid'),
 	],
 	validateRequest,
 	currentUser,
@@ -74,12 +75,15 @@ router.post(
 			timeOfDeparture,
 		} = req.body;
 
-		// passenger: string;
-		// driver: string;
-		// ride: string;
-		// vehicle: string;
-		// destination: LocationType;
-		// timeOfDeparture: Date;
+		const { id, email } = req.currentUser;
+		const existingUser = await User.findOne({
+			id,
+			email,
+		});
+
+		if (!existingUser) {
+			throw new BadRequestError('User does not exist');
+		}
 
 		const matchRide = MatchRide.build({
 			passenger: passengerID,
@@ -109,7 +113,7 @@ router.post(
 			res.status(201).send(matchRide);
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("Match ride not created");
+			throw new BadRequestError('Match ride not created');
 		}
 	}
 );
