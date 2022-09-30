@@ -2,6 +2,11 @@ import { natsWrapper } from "@kmalae.ltd/library";
 import mongoose from "mongoose";
 import { app } from "./app";
 
+// importing event listeners
+import { MatchRideCreatedListener } from "./events/listen/match-ride-listener/match-ride-created-listener";
+import { MatchRideConfirmedListener } from "./events/listen/match-ride-listener/match-ride-confirmed-listener";
+import { MatchRideCancelledListener } from "./events/listen/match-ride-listener/match-ride-cancelled-listener";
+
 app.listen(3000, async () => {
 	if (!process.env.JWT_KEY) throw new Error("JWT_KEY must be defined");
 
@@ -38,7 +43,10 @@ app.listen(3000, async () => {
 		process.on("SIGINT", () => natsWrapper.client.close());
 		process.on("SIGTERM", () => natsWrapper.client.close());
 
-		// Listenting to Payment changes
+		// Listenting to Match-Ride changes
+		new MatchRideCreatedListener(natsWrapper.client).listen();
+		new MatchRideConfirmedListener(natsWrapper.client).listen();
+		new MatchRideCancelledListener(natsWrapper.client).listen();
 	} catch (error) {
 		console.error(error);
 	}
