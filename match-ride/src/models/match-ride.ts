@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import {
 	LocationType,
 	MatchRideStatus,
 	WhoCancelled,
-} from "@kmalae.ltd/library";
+} from '@kmalae.ltd/library';
 
 interface MatchRideAttr {
 	passenger: string;
@@ -15,7 +15,7 @@ interface MatchRideAttr {
 	timeOfDeparture: Date;
 }
 
-export interface MatchRideDoc extends mongoose.Document {
+export interface MatchRideDoc extends MatchRideAttr, mongoose.Document {
 	status: MatchRideStatus;
 	createdAt: Date;
 	whoCancelled: WhoCancelled;
@@ -28,17 +28,17 @@ interface MatchRideModel extends mongoose.Model<MatchRideDoc> {
 
 const MatchRideSchema = new mongoose.Schema(
 	{
-		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		passenger: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+		driver: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 		ride: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: "RideRequest",
+			ref: 'RideRequest',
 		},
 		vehicle: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: "Vehicle",
+			ref: 'Vehicle',
 		},
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
@@ -53,7 +53,7 @@ const MatchRideSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 			enum: Object.values(WhoCancelled),
-			default: WhoCancelled.None, 
+			default: WhoCancelled.None,
 		},
 	},
 	{
@@ -69,7 +69,7 @@ const MatchRideSchema = new mongoose.Schema(
 );
 
 MatchRideSchema.index({ _id: 1, ride: 1, passenger: 1, driver: 1 });
-MatchRideSchema.set("versionKey", "version");
+MatchRideSchema.set('versionKey', 'version');
 MatchRideSchema.plugin(updateIfCurrentPlugin);
 
 MatchRideSchema.statics.build = (attrs: MatchRideAttr) => {
@@ -77,7 +77,7 @@ MatchRideSchema.statics.build = (attrs: MatchRideAttr) => {
 };
 
 const MatchRide = mongoose.model<MatchRideDoc, MatchRideModel>(
-	"MatchRide",
+	'MatchRide',
 	MatchRideSchema
 );
 
