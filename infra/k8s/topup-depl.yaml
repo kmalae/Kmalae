@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: topup-depl
+spec:
+   replicas: 1
+   selector:
+      matchLabels:
+         app: topup
+   template:
+      metadata:
+         labels:
+            app: topup
+      spec:
+         containers:
+            - name: topup
+              image: kmalae/topup
+              env:
+                 - name: NATS_CLIENT_ID
+                   valueFrom:
+                      fieldRef:
+                         fieldPath: metadata.name
+                 - name: NATS_URL
+                   value: "http://nats-srv:4222"
+                 - name: NATS_CLUSTER_ID
+                   value: kmalae
+                 - name: MONGO_URL
+                   value: "mongodb+srv://programmer:FTpt8FH8fSxVXS1e@kmalae.muye3x2.mongodb.net/?retryWrites=true&w=majority"
+                 - name: JWT_KEY
+                   valueFrom:
+                      secretKeyRef:
+                         name: jwt-secret
+                         key: JWT_KEY
+                 - name: STRIPE_KEY
+                   valueFrom:
+                      secretKeyRef:
+                         name: stripe-secret
+                         key: STRIPE_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: topup-srv
+spec:
+   selector:
+      app: topup
+   ports:
+      - name: topup
+        protocol: TCP
+        port: 3000
+        targetPort: 3000
