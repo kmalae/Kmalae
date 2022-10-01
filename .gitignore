@@ -1,9 +1,11 @@
 node_modules
 JWT-secret-key.yaml
+STRIPE-secret-key.yaml
 library
 
 auth
 ride-request
 recommendation
 MobileClient
-MatchRide
+match-ride
+review
