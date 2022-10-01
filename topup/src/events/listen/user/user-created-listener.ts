@@ -3,12 +3,17 @@ import {
 	Listener,
 	Subjects,
 	UserRegisteredEvent,
+	natsWrapper,
 } from "@kmalae.ltd/library";
 import { Message } from "node-nats-streaming";
 import { queueGroupName } from "../queue-group-name";
 
 // importing models and services
 import { User } from "../../../models/user";
+import { Topup } from "../../../models/topup";
+
+// importing Event publishers
+import { TopupCreatedPublisher } from "../../publish/topup-created-publisher";
 
 export class UserRegisteredListener extends Listener<UserRegisteredEvent> {
 	subject: Subjects.UserRegistered = Subjects.UserRegistered;
@@ -26,10 +31,30 @@ export class UserRegisteredListener extends Listener<UserRegisteredEvent> {
 		try {
 			await user.save();
 
+			const topup = Topup.build({
+				user: user.id,
+				points: 0,
+				TopupsPerfomed: [],
+			});
+
+			try {
+				await topup.save();
+
+				// publishing Topup data
+				new TopupCreatedPublisher(natsWrapper.client).publish({
+					id,
+					user: user.id,
+					points: topup.points,
+					version,
+				});
+			} catch (error) {
+				throw new BadRequestError("Topup not created");
+			}
+
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("User not created: Ride-Request");
+			throw new BadRequestError("User not created: Topup");
 		}
 	}
 }

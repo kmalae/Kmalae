@@ -52,3 +52,10 @@ spec:
                       name: topup-srv
                       port:
                          number: 3000
+              - path: /api/payment/?(.*)
+                pathType: Exact
+                backend:
+                   service:
+                      name: payment-srv
+                      port:
+                         number: 3000
