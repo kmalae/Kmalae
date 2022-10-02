@@ -12,6 +12,7 @@ interface LiftRequestAttr {
 	timeOfDeparture: Date;
 	user: string;
 	vehicle: string;
+	version: number;
 }
 
 export interface LiftRequestDoc extends LiftRequestAttr, mongoose.Document {

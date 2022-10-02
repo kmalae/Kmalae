@@ -48,11 +48,14 @@ router.post(
 			throw new BadRequestError("User does not exist");
 		}
 
-		const existingMatchRide = await MatchRide.findById(matchRequestID);
-
+		const existingMatchRide = await MatchRide.findOne({
+			id: matchRequestID,
+			passenger: existingUser.id,
+		});
 		if (!existingMatchRide) {
-			throw new BadRequestError("Match Ride does not exist");
+			throw new BadRequestError("Match ride does not exist");
 		}
+
 		if (existingMatchRide.status !== MatchRideStatus.Requested) {
 			throw new BadRequestError("Passenger cannot confirm");
 		}

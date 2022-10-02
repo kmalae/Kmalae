@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import {
 	LocationType,
 	MatchRideStatus,
 	WhoCancelled,
-} from '@kmalae.ltd/library';
+} from "@kmalae.ltd/library";
 
 interface MatchRideAttr {
 	passenger: string;
@@ -29,22 +29,22 @@ interface MatchRideModel extends mongoose.Model<MatchRideDoc> {
 
 const MatchRideSchema = new mongoose.Schema(
 	{
-		passenger: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-		driver: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		rideRequest: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: 'RideRequest',
+			ref: "RideRequest",
 		},
 		liftRequest: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: 'LiftRequest',
+			ref: "LiftRequest",
 		},
 		vehicle: {
 			type: mongoose.Types.ObjectId,
 			required: true,
-			ref: 'Vehicle',
+			ref: "Vehicle",
 		},
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
@@ -75,13 +75,12 @@ const MatchRideSchema = new mongoose.Schema(
 );
 
 MatchRideSchema.index({
-	_id: 1,
 	rideRequest: 1,
 	liftRequest: 1,
 	passenger: 1,
 	driver: 1,
 });
-MatchRideSchema.set('versionKey', 'version');
+MatchRideSchema.set("versionKey", "version");
 MatchRideSchema.plugin(updateIfCurrentPlugin);
 
 MatchRideSchema.statics.build = (attrs: MatchRideAttr) => {
@@ -89,7 +88,7 @@ MatchRideSchema.statics.build = (attrs: MatchRideAttr) => {
 };
 
 const MatchRide = mongoose.model<MatchRideDoc, MatchRideModel>(
-	'MatchRide',
+	"MatchRide",
 	MatchRideSchema
 );
 

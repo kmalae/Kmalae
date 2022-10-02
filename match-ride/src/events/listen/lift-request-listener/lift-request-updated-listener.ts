@@ -40,6 +40,7 @@ export class LiftRequestUpdatedListener extends Listener<LiftRequestUpdatedEvent
 			currentLocation,
 			destination,
 			timeOfDeparture,
+			version,
 		});
 
 		try {
