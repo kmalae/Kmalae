@@ -1,10 +1,11 @@
 import { natsWrapper } from "@kmalae.ltd/library";
 import mongoose from "mongoose";
 import { app } from "./app";
+import { PaymentPointsDeductedListener } from "./events/listen/payment-listener/payment-point-deducted-listener";
 
 // importing Event listeners
-import { UserRegisteredListener } from "./events/listen/user/user-created-listener";
-import { UserUpdatedListener } from "./events/listen/user/user-updated-listener";
+import { UserRegisteredListener } from "./events/listen/user-listener/user-created-listener";
+import { UserUpdatedListener } from "./events/listen/user-listener/user-updated-listener";
 
 app.listen(3000, async () => {
 	if (!process.env.JWT_KEY) throw new Error("JWT_KEY must be defined");
@@ -42,9 +43,12 @@ app.listen(3000, async () => {
 		process.on("SIGINT", () => natsWrapper.client.close());
 		process.on("SIGTERM", () => natsWrapper.client.close());
 
-		// Listening to User changed data
+		// Listening to User data
 		new UserRegisteredListener(natsWrapper.client).listen();
 		new UserUpdatedListener(natsWrapper.client).listen();
+
+		// Listening to Payment data for restarting
+		new PaymentPointsDeductedListener(natsWrapper.client).listen();
 	} catch (error) {
 		console.error(error);
 	}
