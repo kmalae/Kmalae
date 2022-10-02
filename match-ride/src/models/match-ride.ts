@@ -9,7 +9,8 @@ import {
 interface MatchRideAttr {
 	passenger: string;
 	driver: string;
-	ride: string;
+	rideRequest: string;
+	liftRequest: string;
 	vehicle: string;
 	destination: LocationType;
 	timeOfDeparture: Date;
@@ -30,10 +31,15 @@ const MatchRideSchema = new mongoose.Schema(
 	{
 		passenger: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
 		driver: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-		ride: {
+		rideRequest: {
 			type: mongoose.Types.ObjectId,
 			required: true,
 			ref: 'RideRequest',
+		},
+		liftRequest: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: 'LiftRequest',
 		},
 		vehicle: {
 			type: mongoose.Types.ObjectId,
@@ -68,7 +74,13 @@ const MatchRideSchema = new mongoose.Schema(
 	}
 );
 
-MatchRideSchema.index({ _id: 1, ride: 1, passenger: 1, driver: 1 });
+MatchRideSchema.index({
+	_id: 1,
+	rideRequest: 1,
+	liftRequest: 1,
+	passenger: 1,
+	driver: 1,
+});
 MatchRideSchema.set('versionKey', 'version');
 MatchRideSchema.plugin(updateIfCurrentPlugin);
 
