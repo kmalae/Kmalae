@@ -67,7 +67,9 @@ router.post(
 			path.join("uploads/" + carImage!.filename)
 		) as Buffer;
 
-		const existingUser = await User.findOne({ id: req.currentUser.id });
+		const { id, email } = req.currentUser;
+
+		const existingUser = await User.findById(id);
 		if (!existingUser) {
 			throw new BadRequestError("User does not exist");
 		}
@@ -80,8 +82,9 @@ router.post(
 				data: carImageBuffer,
 				contentType: imageFormat,
 			},
-			user: existingUser,
+			user: existingUser.id,
 		});
+
 		try {
 			await newVehicle.save();
 

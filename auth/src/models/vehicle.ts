@@ -9,7 +9,7 @@ interface VehicleAttr {
 	carBrand: string;
 	carModel: string;
 	MPG: number;
-	user: UserDoc;
+	user: string;
 	carImage: {
 		data: Buffer;
 		contentType: string;
@@ -52,7 +52,7 @@ const vehicleSchema = new mongoose.Schema(
 	}
 );
 
-vehicleSchema.index({ userId: 1 });
+vehicleSchema.index({ user: 1 });
 vehicleSchema.set("versionKey", "version");
 vehicleSchema.plugin(updateIfCurrentPlugin);
 
