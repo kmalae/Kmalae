@@ -45,3 +45,17 @@ spec:
                       name: review-srv
                       port:
                          number: 3000
+              - path: /api/topup/?(.*)
+                pathType: Exact
+                backend:
+                   service:
+                      name: topup-srv
+                      port:
+                         number: 3000
+              - path: /api/payment/?(.*)
+                pathType: Exact
+                backend:
+                   service:
+                      name: payment-srv
+                      port:
+                         number: 3000

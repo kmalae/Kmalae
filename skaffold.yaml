@@ -40,6 +40,22 @@ build:
            manual:
               - src: "src/**/*.ts"
                 dest: .
+      - image: kmalae/topup
+        context: topup
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
+      - image: kmalae/payment
+        context: payment
+        docker:
+           dockerfile: Dockerfile
+        sync:
+           manual:
+              - src: "src/**/*.ts"
+                dest: .
       - image: kmalae/review
         context: review
         docker:

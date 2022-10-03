@@ -10,11 +10,6 @@ interface MatchRideAttr {
 	_id: string;
 	passenger: string;
 	driver: string;
-	ride: string;
-	vehicle: string;
-	destination: LocationType;
-	timeOfDeparture: Date;
-	status: MatchRideStatus;
 	createdAt: Date;
 	version: number;
 }
@@ -23,10 +18,6 @@ export interface MatchRideDoc extends mongoose.Document {
 	_id: string;
 	passenger: string;
 	driver: string;
-	ride: string;
-	vehicle: string;
-	destination: LocationType;
-	timeOfDeparture: Date;
 	status: MatchRideStatus;
 	createdAt: Date;
 	whoCancelled: WhoCancelled;
@@ -42,18 +33,6 @@ const MatchRideSchema = new mongoose.Schema(
 		_id: { type: mongoose.Types.ObjectId, required: true },
 		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
-		ride: {
-			type: mongoose.Types.ObjectId,
-			required: true,
-			ref: "RideRequest",
-		},
-		vehicle: {
-			type: mongoose.Types.ObjectId,
-			required: true,
-			ref: "Vehicle",
-		},
-		destination: { type: Object, required: true },
-		timeOfDeparture: { type: Date, required: true },
 		status: {
 			type: String,
 			required: true,

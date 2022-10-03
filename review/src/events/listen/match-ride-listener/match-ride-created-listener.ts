@@ -14,27 +14,12 @@ export class MatchRideCreatedListener extends Listener<MatchRideCreatedEvent> {
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: MatchRideCreatedEvent["data"], msg: Message) {
-		const {
-			id,
-			driver,
-			passenger,
-			ride,
-			vehicle,
-			destination,
-			timeOfDeparture,
-			createdAt,
-			version,
-		} = data;
+		const { id, driver, passenger, createdAt, version } = data;
 
 		const matchRide = MatchRide.build({
 			_id: id,
 			driver,
 			passenger,
-			ride,
-			vehicle,
-			destination,
-			timeOfDeparture,
-			status: MatchRideStatus.Requested,
 			createdAt,
 			version,
 		});

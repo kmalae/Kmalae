@@ -4,6 +4,7 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 interface ReviewAttr {
 	passenger: string;
 	driver: string;
+	matchRide: string;
 	passengerRated?: number;
 	passengerCommented?: string;
 	driverRated?: number;
@@ -22,6 +23,11 @@ const reviewSchema = new mongoose.Schema(
 	{
 		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		matchRide: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: "MatchRide",
+		},
 		passengerRated: { type: Number, required: false },
 		passengerCommented: { type: String, required: false },
 		driverRated: { type: Number, required: false },
@@ -42,8 +48,6 @@ const reviewSchema = new mongoose.Schema(
 reviewSchema.index({
 	passenger: 1,
 	driver: 1,
-	rideRequest: 1,
-	liftRequest: 1,
 	matchRide: 1,
 });
 reviewSchema.set("versionKey", "version");
