@@ -5,6 +5,10 @@ import { natsWrapper } from "@kmalae.ltd/library";
 
 // importing models and service
 import { MatchRide } from "../models/match-ride";
+import { User } from "../models/user";
+import { RideRequest } from "../models/ride-request";
+import { LiftRequest } from "../models/lift-request";
+import { Vehicle } from "../models/vehicle";
 
 // importing error-types, middle, and types
 import {
@@ -29,17 +33,16 @@ router.post(
 				return mongoose.Types.ObjectId.isValid(input);
 			})
 			.withMessage("Invalid passenger ID"),
-		body("driverID")
-			.custom((input: string) => {
-				return mongoose.Types.ObjectId.isValid(input);
-			})
-			.withMessage("Invalid driver ID"),
-
 		body("rideRequestID")
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
 			.withMessage("Invalid ride request ID"),
+		body("liftRequestID")
+			.custom((input: string) => {
+				return mongoose.Types.ObjectId.isValid(input);
+			})
+			.withMessage("Invalid lift request ID"),
 		body("vehicleID")
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
@@ -65,27 +68,56 @@ router.post(
 			throw new NotAuthorizedError();
 		}
 
+		const { id, email } = req.currentUser;
 		const {
 			passengerID,
-			driverID,
 			rideRequestID,
+			liftRequestID,
 			vehicleID,
 			destination,
 			timeOfDeparture,
 		} = req.body;
 
-		// passenger: string;
-		// driver: string;
-		// ride: string;
-		// vehicle: string;
-		// destination: LocationType;
-		// timeOfDeparture: Date;
+		const existingDriver = await User.findById(id);
+		if (!existingDriver) {
+			throw new BadRequestError("Driver does not exist");
+		}
+
+		const existingVehicle = await Vehicle.findOne({
+			id: vehicleID,
+			user: existingDriver.id,
+		});
+		if (!existingVehicle) {
+			throw new BadRequestError("Vehicle does not exist");
+		}
+
+		const existingPassenger = await User.findById(passengerID);
+		if (!existingPassenger) {
+			throw new BadRequestError("Passener does not exist");
+		}
+
+		const existingRideRequest = await RideRequest.findOne({
+			id: rideRequestID,
+			user: existingPassenger.id,
+		});
+		if (!existingRideRequest) {
+			throw new BadRequestError("Ride request does not exist");
+		}
+
+		const existingLiftRequest = await LiftRequest.findOne({
+			id: liftRequestID,
+			user: existingDriver.id,
+		});
+		if (!existingLiftRequest) {
+			throw new BadRequestError("Lift request does not exist");
+		}
 
 		const matchRide = MatchRide.build({
-			passenger: passengerID,
-			driver: driverID,
-			ride: rideRequestID,
-			vehicle: vehicleID,
+			passenger: existingPassenger.id,
+			driver: existingDriver.id,
+			rideRequest: existingRideRequest.id,
+			liftRequest: existingLiftRequest.id,
+			vehicle: existingVehicle.id,
 			destination,
 			timeOfDeparture,
 		});
@@ -96,12 +128,8 @@ router.post(
 			// publishing match ride data
 			new MatchRideCreatedPublisher(natsWrapper.client).publish({
 				id: matchRide.id,
-				driver: driverID,
-				passenger: passengerID,
-				ride: rideRequestID,
-				vehicle: vehicleID,
-				destination,
-				timeOfDeparture,
+				driver: existingDriver.id,
+				passenger: existingPassenger.id,
 				createdAt: matchRide.createdAt,
 				version: matchRide.version,
 			});

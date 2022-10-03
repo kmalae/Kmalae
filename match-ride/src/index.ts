@@ -3,13 +3,13 @@ import mongoose from "mongoose";
 import { app } from "./app";
 
 // importing User event listeners
-import { UserRegisteredListener } from "./events/listen/user/user-registered-listener";
-import { UserUpdatedListener } from "./events/listen/user/user-updated-listener";
+import { UserRegisteredListener } from "./events/listen/user-listener/user-registered-listener";
+import { UserUpdatedListener } from "./events/listen/user-listener/user-updated-listener";
 
 // importing Vehicle event listeners
-import { VehicleRegisteredListener } from "./events/listen/vehicle/vehicle-registered-listener";
-import { VehicleUpdatedListener } from "./events/listen/vehicle/vehicle-updated-listener";
-import { VehicleDeletedListener } from "./events/listen/vehicle/vehicle-deleted-listener";
+import { VehicleRegisteredListener } from "./events/listen/vehicle-listener/vehicle-registered-listener";
+import { VehicleUpdatedListener } from "./events/listen/vehicle-listener/vehicle-updated-listener";
+import { VehicleDeletedListener } from "./events/listen/vehicle-listener/vehicle-deleted-listener";
 
 // importing Ride-Request event listeners
 import { RideRequestCreatedListener } from "./events/listen/ride-request-listener/ride-request-created-listener";
@@ -20,6 +20,9 @@ import { RideRequestCancelledListener } from "./events/listen/ride-request-liste
 import { LiftRequestCreatedListener } from "./events/listen/lift-request-listener/lift-request-created-listener";
 import { LiftRequestUpdatedListener } from "./events/listen/lift-request-listener/lift-request-updated-listener";
 import { LiftRequestCancelledListener } from "./events/listen/lift-request-listener/lift-request-cancelled-listener";
+
+// importing Payment event listeners
+import { PaymentPointsDeductedListener } from "./events/listen/payment-listener/payment-points-deducted-listener";
 
 app.listen(3000, async () => {
 	if (!process.env.JWT_KEY) throw new Error("JWT_KEY must be defined");
@@ -57,24 +60,27 @@ app.listen(3000, async () => {
 		process.on("SIGINT", () => natsWrapper.client.close());
 		process.on("SIGTERM", () => natsWrapper.client.close());
 
-		// Listenting to User changes
+		// Listenting to User data
 		new UserRegisteredListener(natsWrapper.client).listen();
 		new UserUpdatedListener(natsWrapper.client).listen();
 
-		// Listening to Vehicle changes
+		// Listening to Vehicle data
 		new VehicleRegisteredListener(natsWrapper.client).listen();
 		new VehicleUpdatedListener(natsWrapper.client).listen();
 		new VehicleDeletedListener(natsWrapper.client).listen();
 
-		// Listening to Ride-Request changes
+		// Listening to Ride-Request data
 		new RideRequestCreatedListener(natsWrapper.client).listen();
 		new RideRequestUpdatedListener(natsWrapper.client).listen();
 		new RideRequestCancelledListener(natsWrapper.client).listen();
 
-		// Listening to Ride-Request changes
+		// Listening to Ride-Request data
 		new LiftRequestCreatedListener(natsWrapper.client).listen();
 		new LiftRequestUpdatedListener(natsWrapper.client).listen();
 		new LiftRequestCancelledListener(natsWrapper.client).listen();
+
+		// Listening to Payment data
+		new PaymentPointsDeductedListener(natsWrapper.client).listen();
 	} catch (error) {
 		console.error(error);
 	}

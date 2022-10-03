@@ -39,20 +39,24 @@ router.post(
 		const { matchRequestID } = req.body;
 
 		const { id, email } = req.currentUser;
-		const existingUser = await User.findOne({
+		const existingPassenger = await User.findOne({
 			id,
 			email,
 		});
 
-		if (!existingUser) {
-			throw new BadRequestError("User does not exist");
+		if (!existingPassenger) {
+			throw new BadRequestError("Passenger does not exist");
 		}
 
-		const existingMatchRide = await MatchRide.findById(matchRequestID);
+		const existingMatchRide = await MatchRide.findOne({
+			id: matchRequestID,
+			passenger: new mongoose.Types.ObjectId(existingPassenger.id),
+		});
 
 		if (!existingMatchRide) {
-			throw new BadRequestError("Match Ride does not exist");
+			throw new BadRequestError("Match ride does not exist");
 		}
+
 		if (existingMatchRide.status !== MatchRideStatus.Requested) {
 			throw new BadRequestError("Passenger cannot confirm");
 		}

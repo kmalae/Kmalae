@@ -42,7 +42,7 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 		}
 
 		passengerTopup.points = passengerTopup.points - amountPaid;
-		driverTopup.points = driverTopup.points + amountPaid;
+		driverTopup.points = driverTopup.points + parseInt(amountPaid.toString());
 
 		try {
 			await passengerTopup.save();
@@ -50,6 +50,7 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 
 			msg.ack();
 		} catch (error) {
+			console.log(error);
 			throw new BadRequestError("Topup not performed: Payment");
 		}
 	}
