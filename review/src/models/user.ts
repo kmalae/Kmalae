@@ -5,12 +5,15 @@ import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 interface UserAttr {
 	_id: string;
 	email: string;
-	version: number;
+	firstName: string;
+	lastName: string;
 }
 
 export interface UserDoc extends mongoose.Document {
 	_id: string;
 	email: string;
+	firstName: string;
+	lastName: string;
 	version: number;
 }
 
@@ -22,7 +25,8 @@ const userSchema = new mongoose.Schema(
 	{
 		_id: { type: mongoose.Types.ObjectId, required: true },
 		email: { type: String, required: true },
-		version: { type: Number, required: true },
+		firstName: { type: String, required: true },
+		lastName: { type: String, required: true },
 	},
 	{
 		toJSON: {

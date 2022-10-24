@@ -21,49 +21,29 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: PaymentPointsDeductedEvent["data"], msg: Message) {
-		const { matchRide, passenger, driver, matchRideVersion } = data;
+		const { matchRide, passenger, driver } = data;
 
-		const previousVersion = matchRideVersion - 1;
-		const existingMatchRide = await MatchRide.findOne({
-			id: matchRide,
+		const review = Review.build({
 			passenger,
 			driver,
-			version: previousVersion,
+			matchRide,
 		});
 
-		if (!existingMatchRide) {
-			throw new BadRequestError("MatchRide not found: Review");
-		}
-
-		existingMatchRide.status = MatchRideStatus.Paid;
-
 		try {
-			await existingMatchRide.save();
+			await review.save();
 
-			const review = Review.build({
+			// publishing Review data
+			new ReviewCreatedPublisher(natsWrapper.client).publish({
+				id: review.id,
 				passenger,
 				driver,
 				matchRide,
+				version: review.version,
 			});
-
-			try {
-				await review.save();
-
-				// publishing Review data
-				new ReviewCreatedPublisher(natsWrapper.client).publish({
-					id: review.id,
-					passenger,
-					driver,
-					matchRide,
-					version: review.version,
-				});
-			} catch (error) {
-				throw new BadRequestError("Review not created");
-			}
-
-			msg.ack();
 		} catch (error) {
-			throw new BadRequestError("MatchRide not updated: Review");
+			throw new BadRequestError("Review not created");
 		}
+
+		msg.ack();
 	}
 }

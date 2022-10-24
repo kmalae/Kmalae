@@ -4,6 +4,7 @@ import {
 	MatchRideCreatedEvent,
 	BadRequestError,
 	MatchRideStatus,
+	WhoCancelled,
 } from "@kmalae.ltd/library";
 import { Message } from "node-nats-streaming";
 import { MatchRide } from "../../../models/match-ride";
@@ -14,14 +15,17 @@ export class MatchRideCreatedListener extends Listener<MatchRideCreatedEvent> {
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: MatchRideCreatedEvent["data"], msg: Message) {
-		const { id, driver, passenger, createdAt, version } = data;
+		const { id, driver, passenger, destination, timeOfDeparture, createdAt } =
+			data;
 
 		const matchRide = MatchRide.build({
-			_id: id,
+			id,
 			driver,
 			passenger,
+			destination,
+			timeOfDeparture,
 			createdAt,
-			version,
+			status: MatchRideStatus.Requested,
 		});
 
 		try {

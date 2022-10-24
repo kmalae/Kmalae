@@ -7,20 +7,23 @@ import {
 } from "@kmalae.ltd/library";
 
 interface MatchRideAttr {
-	_id: string;
+	id: string;
 	passenger: string;
 	driver: string;
+	destination: LocationType;
+	timeOfDeparture: Date;
 	createdAt: Date;
-	version: number;
+	status: MatchRideStatus;
 }
 
 export interface MatchRideDoc extends mongoose.Document {
-	_id: string;
+	id: string;
 	passenger: string;
 	driver: string;
-	status: MatchRideStatus;
+	destination: LocationType;
+	timeOfDeparture: Date;
 	createdAt: Date;
-	whoCancelled: WhoCancelled;
+	status: MatchRideStatus;
 	version: number;
 }
 
@@ -39,6 +42,8 @@ const MatchRideSchema = new mongoose.Schema(
 			enum: Object.values(MatchRideStatus),
 			default: MatchRideStatus.Requested,
 		},
+		destination: { type: Object, required: true },
+		timeOfDeparture: { type: Date, required: true },
 		createdAt: { type: Date, required: true, default: Date.now },
 		whoCancelled: {
 			type: String,
@@ -60,7 +65,7 @@ const MatchRideSchema = new mongoose.Schema(
 	}
 );
 
-MatchRideSchema.index({ _id: 1, ride: 1, passenger: 1, driver: 1 });
+MatchRideSchema.index({ _id: 1, passenger: 1, driver: 1 });
 MatchRideSchema.set("versionKey", "version");
 MatchRideSchema.plugin(updateIfCurrentPlugin);
 

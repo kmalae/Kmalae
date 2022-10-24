@@ -17,7 +17,7 @@ import {
 } from "@kmalae.ltd/library";
 
 // importing event publishers and listeners
-import { ReviewUpdatedPublisher } from "../events/publish/review-Updated-publisher";
+import { ReviewUpdatedPublisher } from "../events/publish/review-updated-publisher";
 
 const router = express.Router();
 
@@ -41,8 +41,6 @@ router.post(
 			.notEmpty()
 			.withMessage("Rating must be provided")
 			.isNumeric()
-			.not()
-			.isDecimal()
 			.withMessage("Rating must be number")
 			.custom((input: number) => {
 				return input <= 5 && input >= 0;
@@ -58,28 +56,14 @@ router.post(
 		}
 
 		const { id, email } = req.currentUser;
-		const existingDriver = await User.findOne({
-			id,
-			email,
-		});
-
-		if (!existingDriver) {
-			throw new BadRequestError("Driver does not exist");
-		}
 
 		const { passengerID, matchRequestID, driverRating, driverComment } =
 			req.body;
 
-		const existingPassenger = await User.findById(passengerID);
-
-		if (!existingPassenger) {
-			throw new BadRequestError("Passenger does not exist");
-		}
-
 		const existingMatchRide = await MatchRide.findOne({
 			id: matchRequestID,
-			passenger: existingPassenger.id,
-			driver: existingDriver.id,
+			passenger: passengerID,
+			driver: id,
 		});
 
 		if (!existingMatchRide) {
@@ -87,8 +71,8 @@ router.post(
 		}
 
 		const existingReview = await Review.findOne({
-			passenger: existingPassenger.id,
-			driver: existingDriver.id,
+			passenger: passengerID,
+			driver: id,
 			matchRide: matchRequestID,
 		});
 

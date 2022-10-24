@@ -58,28 +58,14 @@ router.post(
 		}
 
 		const { id, email } = req.currentUser;
-		const existingPassenger = await User.findOne({
-			id,
-			email,
-		});
-
-		if (!existingPassenger) {
-			throw new BadRequestError("Passenger does not exist");
-		}
 
 		const { driverID, matchRequestID, passengerComment, passengerRating } =
 			req.body;
 
-		const existingDriver = await User.findById(driverID);
-
-		if (!existingDriver) {
-			throw new BadRequestError("Driver does not exist");
-		}
-
 		const existingMatchRide = await MatchRide.findOne({
 			id: matchRequestID,
-			passenger: existingPassenger.id,
-			driver: existingDriver.id,
+			passenger: id,
+			driver: driverID,
 		});
 
 		if (!existingMatchRide) {
@@ -87,8 +73,8 @@ router.post(
 		}
 
 		const existingReview = await Review.findOne({
-			passenger: existingPassenger.id,
-			driver: existingDriver.id,
+			passenger: id,
+			driver: driverID,
 			matchRide: matchRequestID,
 		});
 
