@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { UserDoc } from './user';
-import { VehicleDoc } from './vehicle';
+import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import { UserDoc } from "./user";
+import { VehicleDoc } from "./vehicle";
 
-import { LiftRequestStatus, LocationType } from '@kmalae.ltd/library';
+import { LiftRequestStatus, LocationType } from "@kmalae.ltd/library";
 
 interface LiftRequestAttr {
 	currentLocation: LocationType;
@@ -25,8 +25,12 @@ interface LiftRequestModel extends mongoose.Model<LiftRequestDoc> {
 
 const liftRequestSchema = new mongoose.Schema(
 	{
-		user: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
-		vehicle: { type: mongoose.Types.ObjectId, required: true, ref: 'Vehicle' },
+		user: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+		vehicle: {
+			type: mongoose.Types.ObjectId,
+			required: true,
+			ref: "Vehicle",
+		},
 		currentLocation: { type: Object, required: true },
 		destination: { type: Object, required: true },
 		timeOfDeparture: { type: Date, required: true },
@@ -52,14 +56,14 @@ const liftRequestSchema = new mongoose.Schema(
 
 liftRequestSchema.index({ user: 1, vehicle: 1 });
 liftRequestSchema.plugin(updateIfCurrentPlugin);
-liftRequestSchema.set('versionKey', 'version');
+liftRequestSchema.set("versionKey", "version");
 
 liftRequestSchema.statics.build = (attrs: LiftRequestAttr) => {
 	return new LiftRequest(attrs);
 };
 
 const LiftRequest = mongoose.model<LiftRequestDoc, LiftRequestModel>(
-	'Lift',
+	"Lift",
 	liftRequestSchema
 );
 

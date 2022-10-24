@@ -10,13 +10,18 @@ interface MatchRideAttr {
 	id: string;
 	passenger: string;
 	driver: string;
+	destination: LocationType;
+	timeOfDeparture: Date;
 	createdAt: Date;
-	version: number;
+	status: MatchRideStatus;
 }
 
 export interface MatchRideDoc extends mongoose.Document {
+	id: string;
 	passenger: string;
 	driver: string;
+	destination: LocationType;
+	timeOfDeparture: Date;
 	createdAt: Date;
 	status: MatchRideStatus;
 	version: number;
@@ -28,6 +33,7 @@ interface MatchRideModel extends mongoose.Model<MatchRideDoc> {
 
 const MatchRideSchema = new mongoose.Schema(
 	{
+		_id: { type: mongoose.Types.ObjectId, required: true },
 		passenger: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		driver: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
 		status: {
@@ -36,6 +42,8 @@ const MatchRideSchema = new mongoose.Schema(
 			enum: Object.values(MatchRideStatus),
 			default: MatchRideStatus.Requested,
 		},
+		destination: { type: Object, required: true },
+		timeOfDeparture: { type: Date, required: true },
 		createdAt: { type: Date, required: true, default: Date.now },
 		whoCancelled: {
 			type: String,
@@ -53,21 +61,16 @@ const MatchRideSchema = new mongoose.Schema(
 			},
 		},
 		timestamps: { createdAt: false },
+		_id: false,
 	}
 );
 
-MatchRideSchema.index({ passenger: 1, driver: 1 });
+MatchRideSchema.index({ _id: 1, passenger: 1, driver: 1 });
 MatchRideSchema.set("versionKey", "version");
 MatchRideSchema.plugin(updateIfCurrentPlugin);
 
 MatchRideSchema.statics.build = (attrs: MatchRideAttr) => {
-	return new MatchRide({
-		_id: attrs.id,
-		passenger: attrs.passenger,
-		driver: attrs.driver,
-		createdAt: attrs.createdAt,
-		version: attrs.version,
-	});
+	return new MatchRide(attrs);
 };
 
 const MatchRide = mongoose.model<MatchRideDoc, MatchRideModel>(

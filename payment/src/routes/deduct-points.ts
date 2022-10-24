@@ -92,8 +92,18 @@ router.post(
 		}
 
 		existingPassengerTopup.points =
-			existingPassengerTopup.points - amountPaid;
-		existingDriverTopup.points = existingDriverTopup.points + amountPaid;
+			existingPassengerTopup.points - parseInt(amountPaid);
+		existingDriverTopup.points =
+			existingDriverTopup.points + parseInt(amountPaid);
+
+		console.log("type of amountPaid = " + amountPaid);
+		console.log(
+			"type of driverTopup.points = " + typeof existingDriverTopup.points
+		);
+		console.log(
+			"type of passengerTopup.points = " +
+				typeof existingPassengerTopup.points
+		);
 
 		const payment = Payment.build({
 			passenger: existingPassenger.id,

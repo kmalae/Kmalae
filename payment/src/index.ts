@@ -51,7 +51,7 @@ app.listen(3000, async () => {
 		process.on("SIGINT", () => natsWrapper.client.close());
 		process.on("SIGTERM", () => natsWrapper.client.close());
 
-		// Listening to User changed data
+		// Listening to User data
 		new UserRegisteredListener(natsWrapper.client).listen();
 		new UserUpdatedListener(natsWrapper.client).listen();
 

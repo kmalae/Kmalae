@@ -13,7 +13,7 @@ export class TopupCreatedListener extends Listener<TopupCreatedEvent> {
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: TopupCreatedEvent["data"], msg: Message) {
-		const { id, user, points, version } = data;
+		const { id, user, points } = data;
 
 		const topup = Topup.build({
 			_id: id,

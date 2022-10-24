@@ -1,7 +1,7 @@
 import {
 	Listener,
 	Subjects,
-	MatchRideCancelledEvent,
+	MatchRidePaidEvent,
 	BadRequestError,
 	MatchRideStatus,
 } from "@kmalae.ltd/library";
@@ -9,12 +9,12 @@ import { Message } from "node-nats-streaming";
 import { MatchRide } from "../../../models/match-ride";
 import { queueGroupName } from "../queue-group-name";
 
-export class MatchRideCancelledListener extends Listener<MatchRideCancelledEvent> {
-	subject: Subjects.MatchRideCancelled = Subjects.MatchRideCancelled;
+export class MatchRidePaidListener extends Listener<MatchRidePaidEvent> {
+	subject: Subjects.MatchRidePaid = Subjects.MatchRidePaid;
 	queueGroupName = queueGroupName;
 
-	async onMessage(data: MatchRideCancelledEvent["data"], msg: Message) {
-		const { id, whoCancelled, version } = data;
+	async onMessage(data: MatchRidePaidEvent["data"], msg: Message) {
+		const { id, version } = data;
 
 		const previousVersion = version - 1;
 		const existingMatchRide = await MatchRide.findOne({
@@ -27,8 +27,7 @@ export class MatchRideCancelledListener extends Listener<MatchRideCancelledEvent
 		}
 
 		existingMatchRide.set({
-			status: MatchRideStatus.Cancelled,
-			whoCancelled,
+			status: MatchRideStatus.Paid,
 		});
 
 		try {
@@ -37,7 +36,7 @@ export class MatchRideCancelledListener extends Listener<MatchRideCancelledEvent
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("Match ride not cancelled: Payment");
+			throw new BadRequestError("Match ride not paid: Payment");
 		}
 	}
 }
