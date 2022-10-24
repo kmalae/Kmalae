@@ -15,7 +15,6 @@ interface RequestAttr {
 	};
 	timeOfDeparture: Date;
 	user: string;
-	version: number;
 }
 
 export interface RequestDoc extends mongoose.Document {

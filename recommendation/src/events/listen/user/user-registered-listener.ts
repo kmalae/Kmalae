@@ -15,12 +15,11 @@ export class UserRegisteredListener extends Listener<UserRegisteredEvent> {
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: UserRegisteredEvent["data"], msg: Message) {
-		const { id, email, version } = data;
+		const { id, email } = data;
 
 		const user = User.build({
 			_id: id,
 			email,
-			version,
 		});
 
 		try {

@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
-import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 // importing error-types, middlewares, and types
-import { VehicleStatus } from '@kmalae.ltd/library';
+import { VehicleStatus } from "@kmalae.ltd/library";
 
 interface VehicleAttr {
 	_id: string;
@@ -14,7 +14,6 @@ interface VehicleAttr {
 		data: Buffer;
 		contentType: string;
 	};
-	version: number;
 }
 
 export interface VehicleDoc extends mongoose.Document {
@@ -40,7 +39,7 @@ const vehicleSchema = new mongoose.Schema(
 		carBrand: { type: String, required: true },
 		carModel: { type: String, required: true },
 		MPG: { type: Number, required: true },
-		user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+		user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 		carImage: { type: Object, required: true },
 		status: {
 			type: String,
@@ -64,7 +63,7 @@ const vehicleSchema = new mongoose.Schema(
 );
 
 vehicleSchema.index({ _id: 1, user: 1 });
-vehicleSchema.set('versionKey', 'version');
+vehicleSchema.set("versionKey", "version");
 vehicleSchema.plugin(updateIfCurrentPlugin);
 
 vehicleSchema.statics.build = (attrs: VehicleAttr) => {
@@ -72,7 +71,7 @@ vehicleSchema.statics.build = (attrs: VehicleAttr) => {
 };
 
 const Vehicle = mongoose.model<VehicleDoc, VehicleModel>(
-	'Vehicle',
+	"Vehicle",
 	vehicleSchema
 );
 

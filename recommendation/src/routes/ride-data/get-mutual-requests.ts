@@ -1,16 +1,9 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-// importing model and services
-import { RideRequest } from "../../models/ride-request";
-
 // importing error-types, middlewards and types
-import {
-	LocationType,
-	Location,
-	validateRequest,
-	currentUser,
-} from "@kmalae.ltd/library";
+import { LocationType, Location, validateRequest } from "@kmalae.ltd/library";
+import { RideRequest } from "../../models/ride-request";
 
 const router = express.Router();
 
@@ -36,7 +29,6 @@ router.post(
 			.withMessage("Invalid radius"),
 	],
 	validateRequest,
-	currentUser,
 	async (req: Request, res: Response) => {
 		let { destination, timeOfDeparture, acceptableRadius } = req.body;
 

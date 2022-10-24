@@ -16,10 +16,11 @@ export class RideRequestCancelledListener extends Listener<RideRequestCancelledE
 	async onMessage(data: RideRequestCancelledEvent["data"], msg: Message) {
 		const { id, user, version } = data;
 
+		const previousVersion = version - 1;
 		const existingRideRequest = await RideRequest.findOne({
 			_id: id,
 			user,
-			version: version - 1,
+			version: previousVersion,
 		});
 
 		if (!existingRideRequest) {

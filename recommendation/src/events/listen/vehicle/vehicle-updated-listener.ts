@@ -16,8 +16,8 @@ export class VehicleUpdatedListener extends Listener<VehicleUpdatedEvent> {
 
 	async onMessage(data: VehicleUpdatedEvent["data"], msg: Message) {
 		const { id, carBrand, carModel, MPG, carImage, user, version } = data;
-		const previousVersion = version - 1;
 
+		const previousVersion = version - 1;
 		const existingVehicle = await Vehicle.findOne({
 			_id: id,
 			version: previousVersion,

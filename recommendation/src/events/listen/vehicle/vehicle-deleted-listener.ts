@@ -18,10 +18,11 @@ export class VehicleDeletedListener extends Listener<VehicleDeletedEvent> {
 	async onMessage(data: VehicleDeletedEvent["data"], msg: Message) {
 		const { id, user, version } = data;
 
+		const previousVersion = version - 1;
 		const existingVehicle = await Vehicle.findOne({
 			_id: id,
 			user,
-			version,
+			version: previousVersion,
 		});
 
 		if (!existingVehicle) {

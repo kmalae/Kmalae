@@ -15,7 +15,7 @@ export class VehicleRegisteredListener extends Listener<VehicleRegisteredEvent> 
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: VehicleRegisteredEvent["data"], msg: Message) {
-		const { id, carBrand, carModel, MPG, carImage, user, version } = data;
+		const { id, carBrand, carModel, MPG, carImage, user } = data;
 
 		const vehicle = Vehicle.build({
 			_id: id,
@@ -24,7 +24,6 @@ export class VehicleRegisteredListener extends Listener<VehicleRegisteredEvent> 
 			MPG,
 			carImage,
 			user,
-			version,
 		});
 
 		try {

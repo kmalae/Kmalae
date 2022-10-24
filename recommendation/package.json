@@ -12,7 +12,7 @@
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.16",
     "@googlemaps/js-api-loader": "^1.14.3",
-    "@kmalae.ltd/library": "^0.0.36",
+    "@kmalae.ltd/library": "^0.0.79",
     "@types/express": "^4.17.13",
     "@types/google.maps": "^3.50.2",
     "@types/mongoose": "^5.11.97",

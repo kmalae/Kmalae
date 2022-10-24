@@ -10,7 +10,6 @@ interface ReviewAttr {
 	passengerCommented: string;
 	driverRated: number;
 	driverCommented: string;
-	version: number;
 }
 
 export interface ReviewDoc extends mongoose.Document {
@@ -39,7 +38,6 @@ const reviewSchema = new mongoose.Schema(
 		passengerCommented: { type: String, required: true },
 		driverRated: { type: Number, required: true },
 		driverCommented: { type: String, required: true },
-		version: { type: Number, required: true },
 	},
 	{
 		toJSON: {

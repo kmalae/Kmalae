@@ -13,8 +13,7 @@ export class RideRequestCreatedListener extends Listener<RideRequestCreatedEvent
 	queueGroupName = queueGroupName;
 
 	async onMessage(data: RideRequestCreatedEvent["data"], msg: Message) {
-		const { id, pickUpPoint, destination, timeOfDeparture, user, version } =
-			data;
+		const { id, pickUpPoint, destination, timeOfDeparture, user } = data;
 
 		const rideRequest = RideRequest.build({
 			_id: id,
@@ -22,7 +21,6 @@ export class RideRequestCreatedListener extends Listener<RideRequestCreatedEvent
 			destination,
 			timeOfDeparture,
 			user,
-			version,
 		});
 
 		try {
@@ -31,7 +29,7 @@ export class RideRequestCreatedListener extends Listener<RideRequestCreatedEvent
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("Ride request not updated: Ride-Request");
+			throw new BadRequestError("Ride request not updated: Recomm");
 		}
 	}
 }

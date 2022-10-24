@@ -1,11 +1,11 @@
-import express, { Request, Response } from "express";
-import { body } from "express-validator";
-import mongoose from "mongoose";
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import mongoose from 'mongoose';
 
 // importing models and services
-import { LiftRequest } from "../../models/lift-request";
-import { User } from "../../models/user";
-import { Vehicle } from "../../models/vehicle";
+import { LiftRequest } from '../../models/lift-request';
+import { User } from '../../models/user';
+import { Vehicle } from '../../models/vehicle';
 
 // importing error-types, middlewares, types, and services
 import {
@@ -16,38 +16,38 @@ import {
 	Location,
 	BadRequestError,
 	natsWrapper,
-} from "@kmalae.ltd/library";
+} from '@kmalae.ltd/library';
 
 // importing event publishers and listeners
-import { LiftRequestCreatedPublisher } from "../../events/publish/lift-request/lift-request-created-publisher";
+import { LiftRequestCreatedPublisher } from '../../events/publish/lift-request/lift-request-created-publisher';
 
 const router = express.Router();
 
 router.post(
-	"/api/recomm/createLiftRequest",
+	'/api/recomm/createLiftRequest',
 	[
-		body("vehicleID")
+		body('vehicleID')
 			.custom((input: string) => {
 				return mongoose.Types.ObjectId.isValid(input);
 			})
-			.withMessage("Invalid vehicle ID"),
-		body("currentLocation")
+			.withMessage('Invalid vehicle ID'),
+		body('currentLocation')
 			.custom((input: LocationType) => {
 				return Location(input);
 			})
-			.withMessage("Invalid current location"),
-		body("destination")
+			.withMessage('Invalid pick up location'),
+		body('destination')
 			.custom((input: LocationType) => {
 				return Location(input);
 			})
-			.withMessage("Invalid destination location"),
-		body("timeOfDeparture")
+			.withMessage('Invalid destination location'),
+		body('timeOfDeparture')
 			.notEmpty()
-			.withMessage("Departure time must be provided")
+			.withMessage('Departure time must be provided')
 			.isISO8601()
-			.withMessage("Incorrect departure time format")
+			.withMessage('Incorrect departure time format')
 			.exists()
-			.withMessage("Departure time must be valid"),
+			.withMessage('Departure time must be valid'),
 	],
 	currentUser,
 	validateRequest,
@@ -66,13 +66,13 @@ router.post(
 		});
 
 		if (!existingUser) {
-			throw new BadRequestError("User does not exist");
+			throw new BadRequestError('User does not exist');
 		}
 
 		const existingVehicle = await Vehicle.findById(vehicleID);
 
 		if (!existingVehicle) {
-			throw new BadRequestError("Vehicle does not exist");
+			throw new BadRequestError('Vehicle does not exist');
 		}
 
 		const liftRequest = LiftRequest.build({
@@ -99,7 +99,7 @@ router.post(
 
 			res.status(201).send(liftRequest);
 		} catch (error) {
-			throw new BadRequestError("Lift request not created");
+			throw new BadRequestError('Lift request not created');
 		}
 	}
 );
