@@ -28,8 +28,9 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 			id: passenger,
 			version: previousPassengerTopupVersion,
 		});
+
 		if (!passengerTopup) {
-			throw new BadRequestError("Passenger not found");
+			throw new BadRequestError("Passenger not found: Topup");
 		}
 
 		const previousDriverTopupVersion = driverTopupVersion - 1;
@@ -38,7 +39,7 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 			version: previousDriverTopupVersion,
 		});
 		if (!driverTopup) {
-			throw new BadRequestError("Driver not found");
+			throw new BadRequestError("Driver not found: Topup");
 		}
 
 		passengerTopup.points = passengerTopup.points - amountPaid;
@@ -51,7 +52,7 @@ export class PaymentPointsDeductedListener extends Listener<PaymentPointsDeducte
 			msg.ack();
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestError("Topup not performed: Payment");
+			throw new BadRequestError("Payment not performed: Topup");
 		}
 	}
 }
