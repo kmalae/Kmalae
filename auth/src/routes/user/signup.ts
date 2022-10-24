@@ -104,6 +104,8 @@ router.post(
 			new UserRegisteredPublisher(natsWrapper.client).publish({
 				id: user.id,
 				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
 				version: user.version,
 			});
 			return res.status(201).send(user);
