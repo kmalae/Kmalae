@@ -10,9 +10,9 @@ import styled from "styled-components";
 import config from "../../config";
 import axios from "axios";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import FirstSignupForm from "../navigations/Signup/FirstSignupForm";
-import SecondSignupForm from "../navigations/Signup/SecondSignupForm";
-import ThirdSignupForm from "../navigations/Signup/ThirdSignupForm";
+import FirstSignupForm from "../navigations/signup-navigations/FirstSignupForm";
+import SecondSignupForm from "../navigations/signup-navigations/SecondSignupForm";
+import ThirdSignupForm from "../navigations/signup-navigations/ThirdSignupForm";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
@@ -150,8 +150,7 @@ const SignupScreen = () => {
 		<View style={styles.outerContainer}>
 			<ImageBackground
 				source={require("../../assets/images/kmalae-bg.png")}
-				style={styles.backgroundImage}
-			></ImageBackground>
+				style={styles.backgroundImage}></ImageBackground>
 			<View style={styles.fader}></View>
 			<SafeAreaView style={styles.container}>
 				<FormContainer>
@@ -194,18 +193,20 @@ const SignupScreen = () => {
 							name="FirstSignupForm"
 							options={{
 								headerShown: false,
-							}}
-						>
+							}}>
 							{(props) => (
-								<FirstSignupForm {...props} delay={delay} setDelay={setDelay} />
+								<FirstSignupForm
+									{...props}
+									delay={delay}
+									setDelay={setDelay}
+								/>
 							)}
 						</Stack.Screen>
 						<Stack.Screen
 							name="SecondSignupForm"
 							options={{
 								headerShown: false,
-							}}
-						>
+							}}>
 							{(props) => (
 								<SecondSignupForm
 									{...props}
@@ -218,10 +219,13 @@ const SignupScreen = () => {
 							name="ThirdSignupForm"
 							options={{
 								headerShown: false,
-							}}
-						>
+							}}>
 							{(props) => (
-								<ThirdSignupForm {...props} delay={delay} setDelay={setDelay} />
+								<ThirdSignupForm
+									{...props}
+									delay={delay}
+									setDelay={setDelay}
+								/>
 							)}
 						</Stack.Screen>
 					</Stack.Navigator>
@@ -237,7 +241,8 @@ const SignupScreen = () => {
 					/>
 
 					<NavigateToSigninButton>
-						<Text style={{ color: "white", fontSize: 18, marginRight: 10 }}>
+						<Text
+							style={{ color: "white", fontSize: 18, marginRight: 10 }}>
 							Already have an account?
 						</Text>
 						<Text
@@ -247,8 +252,7 @@ const SignupScreen = () => {
 							}}
 							onPress={() => {
 								navigator.navigate("LoginScreen");
-							}}
-						>
+							}}>
 							Signin
 						</Text>
 					</NavigateToSigninButton>
@@ -346,9 +350,13 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 							props.navigator.navigate("SecondSignupForm");
 							props.setDelay(true);
 						}
-					}}
-				>
-					<Icon name="arrowleft" type="antdesign" size={23} color="white" />
+					}}>
+					<Icon
+						name="arrowleft"
+						type="antdesign"
+						size={23}
+						color="white"
+					/>
 				</PreviousFormButton>
 			)}
 			<AdvanceButton
@@ -380,8 +388,7 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 							: props.secondFormFilled
 							? 1
 							: 0.7,
-				}}
-			>
+				}}>
 				<Text style={{ fontSize: 25, color: "white" }}>
 					{props.formLoaded !== "third" ? "Next" : "Register"}
 				</Text>

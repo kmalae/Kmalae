@@ -16,8 +16,8 @@ import axios from "axios";
 import config from "../../config";
 
 // importing navigations
-import Main from "../navigations/Topup/Main";
-import Topup from "../navigations/Topup/Topup";
+import Main from "../navigations/topup-navigations/Main";
+import Topup from "../navigations/topup-navigations/Topup";
 
 // importing slices
 import { selectCurrentUser, setCurrentUser } from "../slices/CurrentUserSlice";
@@ -72,16 +72,14 @@ const TopupScreen = () => {
 		<View style={styles.outerContainer}>
 			<ImageBackground
 				source={require("../../assets/images/kmalae-bg.png")}
-				style={styles.backgroundImage}
-			></ImageBackground>
+				style={styles.backgroundImage}></ImageBackground>
 			<View style={styles.fader}></View>
 			<View style={styles.container}>
 				<BalanceContainer>
 					<TextContainer
 						style={{
 							fontSize: 40,
-						}}
-					>
+						}}>
 						AED
 					</TextContainer>
 					<AmountAvailable>
@@ -124,8 +122,7 @@ const TopupScreen = () => {
 							name="Main"
 							options={{
 								headerShown: false,
-							}}
-						>
+							}}>
 							{(props) => <Main delay={delay} setDelay={setDelay} />}
 						</Stack.Screen>
 
@@ -133,8 +130,7 @@ const TopupScreen = () => {
 							name="Topup"
 							options={{
 								headerShown: false,
-							}}
-						>
+							}}>
 							{(props) => <Topup delay={delay} setDelay={setDelay} />}
 						</Stack.Screen>
 					</Stack.Navigator>

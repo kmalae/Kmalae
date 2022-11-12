@@ -10,6 +10,9 @@ import TopupSlice from "./slices/TopupSlice";
 
 import RideLiftSlice from "./slices/RideLiftSlice";
 
+import ReviewSlice from "./slices/ReviewSlice";
+import PaymentSlice from "./slices/PaymentSlice";
+
 export const store = configureStore({
 	reducer: {
 		currentUser: CurrentUserSlice,
@@ -19,6 +22,8 @@ export const store = configureStore({
 		signupErrorMessages: SignupErrorMessagesSlice,
 		topup: TopupSlice,
 		rideLift: RideLiftSlice,
+		review: ReviewSlice,
+		payment: PaymentSlice,
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({

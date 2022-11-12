@@ -22,6 +22,11 @@ import ShowAllUserVehicles from "./src/screens/ShowAllUserVehicle";
 import ShowAllLiftRequests from "./src/screens/ShowAllLiftRequests";
 import ShowAllPotentialPassengers from "./src/screens/ShowAllPotentialPassengers";
 
+import PaymentHistory from "./src/screens/PaymentHistory";
+import PaymentScreen from "./src/screens/PaymentScreen";
+import ReviewScreen from "./src/screens/ReviewScreen";
+import RideHistory from "./src/screens/RideHistory";
+
 const navTheme = {
 	...DefaultTheme,
 	colors: {
@@ -61,7 +66,7 @@ export default function App() {
 									headerShown: false,
 								}}
 							/>
-							<Stack.Screen
+							{/*<Stack.Screen
 								name="TopupScreen"
 								component={TopupScreen}
 								options={{ headerShown: false }}
@@ -117,6 +122,34 @@ export default function App() {
 							<Stack.Screen
 								name="ShowAllRideRequests"
 								component={ShowAllRideRequests}
+								options={{
+									headerShown: false,
+								}}
+							/> */}
+							<Stack.Screen
+								name="RideHistory"
+								component={RideHistory}
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="ReviewScreen"
+								component={ReviewScreen}
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="PaymentHistory"
+								component={PaymentHistory}
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="PaymentScreen"
+								component={PaymentScreen}
 								options={{
 									headerShown: false,
 								}}

@@ -33,7 +33,7 @@ const LoginScreen = () => {
 				if (data.currentUser === null) {
 					return;
 				} else {
-					// navigate to a different screen
+					navigator.navigate("LoginScreen");
 				}
 			});
 	}, []);
@@ -45,7 +45,7 @@ const LoginScreen = () => {
 				email: userEmail,
 				password: userPassword,
 			})
-			.then((response) => navigator.navigate("HomeScreen"))
+			.then((response) => navigator.navigate("PaymentScreen"))
 			.catch((error) => console.log(error.response.data.errors));
 	};
 
