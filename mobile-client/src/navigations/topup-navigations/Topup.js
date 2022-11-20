@@ -13,11 +13,16 @@ import styled from "styled-components";
 import { Icon } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { useConfirmPayment, useStripe } from "@stripe/stripe-react-native";
+import { useStripe } from "@stripe/stripe-react-native";
 
 // importing slices
 import { selectCurrentUser } from "../../slices/CurrentUserSlice";
-import { selectAmountToTopup, setAmountToTopup } from "../../slices/TopupSlice";
+import {
+	setPoints,
+	setTopupHistory,
+	selectAmountToTopup,
+	setAmountToTopup,
+} from "../../slices/TopupSlice";
 import config from "../../../config";
 import axios from "axios";
 
@@ -64,7 +69,6 @@ const Topup = ({ delay, setDelay }) => {
 	const [paymentIntentState, setPaymentIntentState] = useState(null);
 	const currentUser = useSelector(selectCurrentUser);
 	const amountToTopup = useSelector(selectAmountToTopup);
-	const [paymentIntentData, setPaymentIntentData] = useState(null);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -120,19 +124,34 @@ const Topup = ({ delay, setDelay }) => {
 			} else {
 				Alert.alert("Success", "Your topup is confirmed! 😎");
 				dispatch(setAmountToTopup(null));
-				navigator.navigate("Main");
 				await axios
 					.post(`${config.KMALAE_DOMAIN}/api/topup/performTopup`, {
 						paymentIntent: paymentIntentState,
 						amount: amountToTopup,
 					})
-					.then((result) => {
-						setPaymentIntentData(result.data.payment_method_options);
-						console.log(result.data);
+					.then(() => {
+						getUserTopup();
 					})
 					.catch((error) => console.log(error.response.data.errors));
 			}
 		}
+	};
+
+	const getUserTopup = () => {
+		axios
+			.get(`${config.KMALAE_DOMAIN}/api/topup/getUserTopups`)
+			.then((result) => {
+				dispatch(setPoints(result.data.points));
+				dispatch(
+					setTopupHistory(
+						result.data.TopupsPerformed.sort((topup_1, topup_2) =>
+							topup_1.toppedAt > topup_2.toppedAt ? -1 : 1
+						)
+					)
+				);
+				navigator.navigate("Main");
+			})
+			.catch((error) => console.log(error));
 	};
 
 	return !delay ? (
@@ -142,6 +161,7 @@ const Topup = ({ delay, setDelay }) => {
 					onPress={() => {
 						setDelay((current) => true);
 						dispatch(setAmountToTopup(null));
+						setPaymentIntentState(null);
 						navigator.navigate("Main");
 					}}
 				>
@@ -163,15 +183,19 @@ const Topup = ({ delay, setDelay }) => {
 							returnKeyType="done"
 							value={amountToTopup}
 							onChangeText={(value) => {
-								dispatch(setAmountToTopup(value));
+								if (value == "") {
+									dispatch(setAmountToTopup(null));
+									setPaymentIntentState(null);
+								} else dispatch(setAmountToTopup(value));
 							}}
 						/>
 					</View>
 				</TouchableWithoutFeedback>
 				<RightIcon
-					style={{ display: amountToTopup === "" ? "none" : "block" }}
+					style={{ display: amountToTopup === null ? "none" : "block" }}
 					onPress={() => {
 						dispatch(setAmountToTopup(null));
+						setPaymentIntentState(null);
 					}}
 				>
 					<Icon name="cancel" type="fontawesome" size={20} color="white" />
@@ -197,13 +221,14 @@ const Topup = ({ delay, setDelay }) => {
 
 			<RechargeButtonContianer
 				style={{
-					backgroundColor: amountToTopup !== null ? "#872121" : "lightgray",
+					backgroundColor:
+						paymentIntentState !== null ? "#872121" : "lightgray",
 				}}
-				disabled={amountToTopup === null}
+				disabled={paymentIntentState === null}
 				onPress={openPaymentSheet}
 			>
 				<TextContainer
-					style={{ color: amountToTopup !== null ? "white" : "gray" }}
+					style={{ color: paymentIntentState !== null ? "white" : "gray" }}
 				>
 					Topup
 				</TextContainer>

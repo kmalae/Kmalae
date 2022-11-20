@@ -13,7 +13,7 @@ import {
 	setPassword,
 	selectConfirmPassword,
 	setConfirmPassword,
-} from "../../slices/SecondFormSlice";
+} from "../../slices/SignupSlice";
 
 import {
 	selectEmailError,
@@ -24,7 +24,15 @@ import {
 	setConfirmPasswordError,
 } from "../../slices/SignupErrorMessagesSlice.js";
 
-const FirstSignupForm = ({ delay, setDelay }) => {
+import {
+	selectTransitionDelay,
+	setTransitionDelay,
+} from "../../slices/CommonSlice";
+
+const FirstSignupForm = () => {
+	const dispatch = useDispatch();
+
+	const transitionDelay = useSelector(selectTransitionDelay);
 	const email = useSelector(selectEmail);
 	const password = useSelector(selectPassword);
 	const confirmPassword = useSelector(selectConfirmPassword);
@@ -35,16 +43,17 @@ const FirstSignupForm = ({ delay, setDelay }) => {
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			setDelay((current) => false);
+			dispatch(setTransitionDelay(false));
 		}, 500);
 		return () => clearTimeout(timer);
-	}, [delay]);
+	}, [transitionDelay]);
 
-	return !delay ? (
-		<View
-			style={{
-				height: "100%",
-				justifyContent: "center",
+	return !transitionDelay ? (
+		<StackNavigationContainer
+			contentContainerStyle={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
 			}}
 		>
 			<StyledTextInput
@@ -79,13 +88,21 @@ const FirstSignupForm = ({ delay, setDelay }) => {
 				setErrorMessage={setConfirmPasswordError}
 				axiosLabel={"confirmPassword"}
 			/>
-		</View>
+		</StackNavigationContainer>
 	) : (
 		<></>
 	);
 };
 
 export default FirstSignupForm;
+
+const StackNavigationContainer = styled.ScrollView`
+	margin-top: 20%;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+`;
 
 const StyledTextInput = ({
 	icon,
@@ -148,8 +165,8 @@ const StyledTextInput = ({
 
 const InputContainer = styled.View`
 	background-color: white;
-	height: 58px;
-	width: 97%;
+	height: 55px;
+	width: 310px;
 	border-width: 2px;
 	border-radius: 10px;
 	border-color: lightgreen;

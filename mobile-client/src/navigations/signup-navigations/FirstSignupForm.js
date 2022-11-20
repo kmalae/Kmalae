@@ -7,7 +7,6 @@ import styled from "styled-components";
 import config from "../../../config";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { Appearance } from "react-native";
 
 import {
 	selectFirstName,
@@ -20,7 +19,7 @@ import {
 	setIDNumber,
 	selectPhoneNumber,
 	setPhoneNumber,
-} from "../../slices/FirstFormSlice";
+} from "../../slices/SignupSlice";
 
 import {
 	selectFirstNameError,
@@ -35,7 +34,16 @@ import {
 	setPhoneNumberError,
 } from "../../slices/SignupErrorMessagesSlice";
 
-const FirstSignupForm = ({ delay, setDelay }) => {
+import {
+	selectTransitionDelay,
+	setTransitionDelay,
+} from "../../slices/CommonSlice";
+
+const FirstSignupForm = () => {
+	const dispatch = useDispatch();
+
+	const transitionDelay = useSelector(selectTransitionDelay);
+
 	const firstName = useSelector(selectFirstName);
 	const lastName = useSelector(selectLastName);
 	const DOB = useSelector(selectDOB);
@@ -50,16 +58,16 @@ const FirstSignupForm = ({ delay, setDelay }) => {
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			setDelay((current) => false);
+			dispatch(setTransitionDelay(false));
 		}, 500);
 		return () => clearTimeout(timer);
-	}, [delay]);
+	}, [transitionDelay]);
 
-	return !delay ? (
-		<View
-			style={{
-				height: "100%",
-				justifyContent: "center",
+	return !transitionDelay ? (
+		<StackNavigationContainer
+			contentContainerStyle={{
+				display: "flex",
+				alignItems: "center",
 			}}
 		>
 			<StyledTextInput
@@ -111,13 +119,20 @@ const FirstSignupForm = ({ delay, setDelay }) => {
 				isTextInput={true}
 				axiosLabel={"phoneNumber"}
 			/>
-		</View>
+		</StackNavigationContainer>
 	) : (
 		<></>
 	);
 };
 
 export default FirstSignupForm;
+
+const StackNavigationContainer = styled.ScrollView`
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+`;
 
 const StyledTextInput = ({
 	placeholder,
@@ -179,9 +194,7 @@ const StyledTextInput = ({
 									)}`
 								)
 							);
-
 							validateInput();
-
 							setDatePickerVisibility(false);
 						}}
 						onCancel={() => setDatePickerVisibility(false)}
@@ -199,8 +212,8 @@ const InputContainer = styled.View`
 	display: flex;
 	flex-direction: column;
 	background-color: white;
-	height: 58px;
-	width: 97%;
+	height: 55px;
+	width: 310px;
 	border-width: 2px;
 	border-radius: 10px;
 	border-color: lightgreen;

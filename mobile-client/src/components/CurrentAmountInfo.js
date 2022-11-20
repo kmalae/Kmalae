@@ -9,10 +9,7 @@ const CurrentAmountInfo = () => {
 	const [currentAmount, setCurrentAmount] = useState();
 	useEffect(() => {
 		axios
-			.get(`${config.KMALAE_DOMAIN}/api/payment/getUserTopup`, {
-				id: "63590e11f5fdd2a3ba3d1c4f",
-				email: "passenger@kmalae.com",
-			})
+			.get(`${config.KMALAE_DOMAIN}/api/payment/getUserTopup`)
 			.then((response) => {
 				setCurrentAmount(response.data.points);
 			});

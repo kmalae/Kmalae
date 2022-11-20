@@ -37,7 +37,12 @@ const Main = ({ delay, setDelay }) => {
 					</ButtonTextContainer>
 				</TopupButtonContainer>
 
-				<TopupHistoryContainer>
+				<TopupHistoryContainer
+					onPress={() => {
+						setDelay(() => true);
+						navigator.navigate("TopupHistory");
+					}}
+				>
 					<TextContainer style={{ fontSize: 23 }}>Topup History</TextContainer>
 					<Icon name="arrow-right" type="fontawesome" size={35} color="white" />
 				</TopupHistoryContainer>

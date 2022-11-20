@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-	// id: null,
-	image: null,
+	driverId: null,
+	matchId: null,
+	avatarID: null,
 	name: null,
 	destination: null,
 	amount: null,
@@ -13,11 +14,15 @@ const paymentSlice = createSlice({
 	name: "payment",
 	initialState,
 	reducers: {
-		// setID: (state, action) => {
-		//     state.id = action.payload;
-		// },
-		setImage: (state, action) => {
-			state.image = action.payload;
+		setdriverId: (state, action) => {
+			state.driverId = action.payload;
+		},
+
+		setmatchId: (state, action) => {
+			state.matchId = action.payload;
+		},
+		setAvatarID: (state, action) => {
+			state.avatarID = action.payload;
 		},
 
 		setName: (state, action) => {
@@ -38,16 +43,18 @@ const paymentSlice = createSlice({
 });
 
 export const {
-	setID,
-	setImage,
+	setdriverId,
+	setmatchId,
+	setAvatarID,
 	setName,
 	setDestination,
 	setAmount,
 	setTravelTimeInformation,
 } = paymentSlice.actions;
 
-// export const selectID = (state) => state.payment.id;
-export const selectImage = (state) => state.payment.image;
+export const selectdriverId = (state) => state.payment.driverId;
+export const selectmatchId = (state) => state.payment.matchId;
+export const selectAvatarID = (state) => state.payment.avatarID;
 export const selectName = (state) => state.payment.name;
 export const selectDestination = (state) => state.payment.destination;
 export const selectAmount = (state) => state.payment.amount;

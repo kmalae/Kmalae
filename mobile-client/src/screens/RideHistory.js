@@ -1,20 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
-import {
-	View,
-	Text,
-	FlatList,
-	StyleSheet,
-	TouchableOpacity,
-	// Image
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { Image } from "react-native-elements";
 import { useState, useEffect } from "react";
+import tw from "tailwind-react-native-classnames";
 import styled from "styled-components";
-import ReviewScreen from "./ReviewScreen";
 import { useDispatch } from "react-redux";
 import {
-	// setId,
-	setImage,
+	setAvatarID,
 	setName,
 	setDestination,
 	setAmount,
@@ -22,55 +14,52 @@ import {
 	setStand,
 	setmatchRide,
 	setcommentedId,
+	setreviewId,
 } from "../slices/ReviewSlice";
-import { useSelector } from "react-redux";
 import axios from "axios";
 import config from "../../config";
 
+import { AvatarImages } from "../../Avatars";
+
 const RideHistory = () => {
+	// let standd = "";
+	const [standd, setStandd] = useState();
 	const [state, setState] = useState(null);
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const [review, setReview] = useState();
+	const [userFirstData, setFirstUserData] = useState();
+	const [userLastData, setLastUserData] = useState();
+	// const [avatarID, setAvatarID] = useState(null);
+	const [avatarImageURI, setAvatarImageURI] = useState(null);
 
-	const base64Converter = ({ data, contentType }, setState) => {
-		// console.log({contentType});
-		const blob = new Blob([data.data], { type: contentType });
-		// console.log(blob);
-		const fileReaderInstance = new FileReader();
-		fileReaderInstance.readAsDataURL(blob);
-		fileReaderInstance.onloadend = () => {
-			// console.log("really entered here")
-			const base64data = fileReaderInstance.result;
-			setState(base64data);
-			return;
-		};
-	};
+	useEffect(() => {
+		axios
+			.get(`${config.KMALAE_DOMAIN}/api/users/getInfo`)
+			.then((response) => {
+				setFirstUserData(response.data.firstName);
+				setLastUserData(response.data.lastName);
+				// setAvatarID(response.data.avatarID);
+			});
+	}, []);
 
-	let stand = "";
+	// useEffect(() => {
+	// 	if (avatarID !== null)
+	// 		AvatarImages.map(({ id, image }) => {
+	// 			if (id == avatarID) setAvatarImageURI(image);
+	// 		});
+	// }, [avatarID]);
+
 	const fetchReview = async (stance) => {
-		if (stance == "driver") {
-			stand = "driver";
-		} else {
-			stand = "passenger";
-		}
+		setReview(null);
 		await axios
 			.post(`${config.KMALAE_DOMAIN}/api/review/getUserReviews`, {
 				stance: stance,
 			})
-			.then((response) => setReview(response.data));
-	};
-	headerComponent = () => {
-		return (
-			<ButtonContainer>
-				<FilterButtonDriver onPress={() => fetchReview("driver")}>
-					<TextButton>As Driver</TextButton>
-				</FilterButtonDriver>
-				<FilterButtonPassenger onPress={() => fetchReview("passenger")}>
-					<TextButton>As Passenger</TextButton>
-				</FilterButtonPassenger>
-			</ButtonContainer>
-		);
+			.then((response) => setReview(response.data))
+			.catch((error) => {
+				console.log(error.response.data.errors);
+			});
 	};
 
 	listSeparator = () => {
@@ -78,94 +67,147 @@ const RideHistory = () => {
 	};
 
 	return (
-		<View>
-			<ReviewerDetails>
+		<>
+			<View style={tw`h-1/3`}>
 				<FirstBlock>
-					<AvatarContainer>
-						<Image
-							source={require("../../assets/images/sizer/person02.png")}
-						/>
-					</AvatarContainer>
+					{/* <AvatarContainer>
+						{avatarImageURI !== null && (
+							<AvatarImage
+								source={{
+									uri: Image.resolveAssetSource(avatarImageURI).uri,
+								}}
+								resizeMode="contain"
+							/>
+						)}
+					</AvatarContainer> */}
 					<Name>
-						<Text style={styles.textStyle}>Amanda John</Text>
+						<NameTextTop>
+							{userFirstData} {userLastData}
+						</NameTextTop>
 					</Name>
-				</FirstBlock>
-				<FlatList
-					ListHeaderComponentStyle={styles.listHeader}
-					ListHeaderComponent={headerComponent}
-					data={review}
-					renderItem={({ item }) => {
-						base64Converter(item.passenger.userImage, setState);
-						// console.log(state)
-						return (
-							<Item
+					<ButtonContainer>
+						<FilterButtonDriverContainer>
+							<FilterButton
 								onPress={() => {
-									dispatch(
-										setImage(
-											require(`../../assets/images/sizer/person0${3}.png`)
-										)
-									);
-									dispatch(
-										setName(
-											item.passenger.firstName +
-												" " +
-												item.passenger.lastName
-										)
-									);
-									dispatch(
-										setDestination(
-											item.matchRide.destination.lat +
-												item.matchRide.destination.lng
-										)
-									);
-									dispatch(setAmount(item.payment.amountPaid / 100));
-									dispatch(
-										setTravelTimeInformation(
-											new Date(
-												item.matchRide.timeOfDeparture
-											).toLocaleDateString()
-										)
-									);
-
-									dispatch(setmatchRide(item.matchRide.id));
-									if (stand == "driver") {
-										dispatch(setcommentedId(item.passenger.id));
-									} else {
-										dispatch(setcommentedId(item.driver.id));
-									}
-									dispatch(setStand(stand));
-
-									// console.log(item.passenger.id);
-									navigation.navigate("ReviewScreen");
+									fetchReview("driver");
+									setStandd("driver");
 								}}>
-								<AvatarContainer>
-									<Image source={state} style={styles.avatar} />
-								</AvatarContainer>
-								<DetailsItem>
-									<NameText>
-										{item.passenger.firstName}{" "}
-										{item.passenger.lastName}
-									</NameText>
-									<AmountText>
-										{item.payment.amountPaid / 100} AED
-									</AmountText>
-									<DestinationText>
-										{new Date(
-											item.matchRide.timeOfDeparture
-										).toLocaleDateString()}
-									</DestinationText>
-									<DestinationText>
-										{item.matchRide.destination.lat} +{" "}
-										{item.matchRide.destination.lng}
-									</DestinationText>
-								</DetailsItem>
-							</Item>
-						);
-					}}
-					ItemSeparatorComponent={listSeparator}
-				/>
-			</ReviewerDetails>
-		</View>
+								<TextButton>As Driver</TextButton>
+							</FilterButton>
+						</FilterButtonDriverContainer>
+						<FilterButtonPassengerContainer>
+							<FilterButton
+								onPress={() => {
+									fetchReview("passenger");
+									setStandd("passenger");
+								}}>
+								<TextButton>As Passenger</TextButton>
+							</FilterButton>
+						</FilterButtonPassengerContainer>
+					</ButtonContainer>
+				</FirstBlock>
+			</View>
+			<View style={tw`h-2/3`}>
+				<ReviewerDetails>
+					<FlatList
+						ListHeaderComponentStyle={styles.listHeader}
+						// ListHeaderComponent={headerComponent}
+						data={review}
+						renderItem={({ item }) => {
+							let imageURI;
+							AvatarImages.map(({ id, image }) => {
+								if (standd == "driver") {
+									if (id == item.passenger.avatarID) imageURI = image;
+								} else {
+									if (id == item.driver.avatarID) imageURI = image;
+								}
+							});
+							return (
+								<Item
+									onPress={() => {
+										dispatch(
+											setAvatarID(
+												standd == "driver"
+													? item.passenger.avatarID
+													: item.driver.avatarID
+											)
+										);
+
+										dispatch(
+											setDestination(
+												item.matchRide.destination.lat +
+													item.matchRide.destination.lng
+											)
+										);
+										dispatch(setAmount(item.matchRide.amountPaid));
+										dispatch(
+											setTravelTimeInformation(
+												new Date(
+													item.matchRide.timeOfDeparture
+												).toLocaleDateString()
+											)
+										);
+										dispatch(setreviewId(item.id));
+
+										dispatch(setmatchRide(item.matchRide.id));
+										if (standd == "driver") {
+											dispatch(
+												setName(
+													item.passenger.firstName +
+														" " +
+														item.passenger.lastName
+												)
+											);
+											dispatch(setcommentedId(item.passenger.id));
+										} else {
+											dispatch(setcommentedId(item.driver.id));
+											dispatch(
+												setName(
+													item.driver.firstName +
+														" " +
+														item.driver.lastName
+												)
+											);
+										}
+										dispatch(setStand(standd));
+										navigation.navigate("ReviewScreen");
+									}}>
+									<AvatarContainer>
+										<AvatarImage
+											source={{
+												uri: Image.resolveAssetSource(imageURI).uri,
+											}}
+											resizeMode="contain"
+										/>
+									</AvatarContainer>
+									<DetailsItem>
+										<NameText>
+											{standd == "driver"
+												? item.passenger.firstName
+												: item.driver.firstName}
+										</NameText>
+
+										<AmountText>
+											{item.matchRide.amountPaid / 100} AED
+										</AmountText>
+										<DestinationText>
+											{new Date(
+												item.matchRide.timeOfDeparture
+											).toLocaleDateString()}
+										</DestinationText>
+										<DestinationText>
+											{item.matchRide.destination.lat} +{" "}
+											{item.matchRide.destination.lng}
+										</DestinationText>
+									</DetailsItem>
+								</Item>
+							);
+						}}
+						ItemSeparatorComponent={listSeparator}
+					/>
+				</ReviewerDetails>
+			</View>
+		</>
 	);
 };
 
@@ -189,28 +231,28 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		fontSize: 21,
 	},
-	avatar: {
-		height: 55,
-		width: 55,
-	},
 	separator: {
 		height: 1,
 		width: "100%",
 		backgroundColor: "#CCC",
 	},
-	textStyle: {
-		marginTop: 15,
-		textAlign: "center",
-		fontSize: 20,
-		fontWeight: "bold",
-	},
 });
-const Item = styled.TouchableOpacity`
-	flex: 1;
-	align-items: "center";
-	align-content: "center";
-	padding-vertical: 13px;
+
+const FirstBlock = styled.View`
+	${"" /* margin-top: 10%; */}
+	height: 100%;
+	background-color: #8b0000;
 `;
+
+const Item = styled.TouchableOpacity`
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	border: 2px solid white;
+	height: 70px;
+`;
+
 const DetailsItem = styled.View`
 	height: 100%;
 	width: 70%;
@@ -219,41 +261,52 @@ const DetailsItem = styled.View`
 	position: absolute;
 `;
 
-const NameText = styled.Text`
+const NameTextTop = styled.Text`
 	font-weight: 600;
-	${"" /* font-size: 15px; */}
-	font-size: 12px;
+	font-size: 20%;
 	margin-left: 5%;
-	padding-bottom: 2%;
+	color: white;
 `;
 const AmountText = styled.Text`
 	font-weight: 600;
 	${"" /* font-size: 12px; */}
-	font-size: 12px;
+	font-size: 12%;
 	margin-left: 80%;
 	position: absolute;
+	color: white;
 `;
 const DestinationText = styled.Text`
 	font-weight: 300;
-	${"" /* font-size: 12px; */}
-	font-size: 12px;
-	margin-left: 13px;
+	font-size: 12%;
+	margin-left: 5%;
 	padding-bottom: 2%;
+	color: white;
 `;
 const AvatarContainer = styled.View`
-	background-color: "#D9D9D9";
 	border-radius: 100%;
-	height: 12%;
-	width: 12%;
-	justify-content: "center";
-	align-items: "center";
+	height: 100%;
+	width: 80px;
+	border: 2px solid white;
+`;
+
+const AvatarImage = styled.Image`
+	height: 100%;
+	width: 70%;
+	border: 2px solid red;
 `;
 
 const Name = styled.View`
-	position: absolute;
-	width: 90%;
-	margin-top: 5%;
-	margin-left: 10%;
+	width: 50%;
+	margin-top: 15%;
+	margin-left: 40%;
+	align-item: center;
+	justify-content: center;
+`;
+const NameText = styled.Text`
+	font-size: 16%;
+	font-weight: 500;
+	color: white;
+	margin-left: 2%;
 `;
 const TopText = styled.Text`
 	opacity: 0.4;
@@ -281,49 +334,45 @@ const ReviewerDetails = styled.View`
 	flex-direction: column;
 	justify-content: flex-start;
 	padding-horizontal: 3%;
-	${"" /* background-color: #EBF5FB; */}
-	background-color: #FEF5E7;
-	${"" /* background-color: #F5B7B1; */};
+	background-color: #fef5e7;
 	background-color: #b1f5d9;
-	${"" /* background-color: #CDF5B1; */}
-	${"" /* background-color: #F5D9B1; */}
+	background-color: black;
 `;
 const ButtonContainer = styled.View`
-	height: 100%;
+	height: 50%;
 	width: 100%;
-	${"" /* background-color: red; */}
-	${"" /* align-items: center; */}
-	${"" /* align-content: center; */}
+	margin-top: 20%;
 `;
-const FilterButtonDriver = styled.TouchableOpacity`
+const FilterButtonDriverContainer = styled.View`
+	width: 50%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+`;
+const FilterButtonPassengerContainer = styled.View`
+	width: 50%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+
+	margin-left: 50%;
 	position: absolute;
-	margin-top: 3%;
+`;
+const FilterButton = styled.TouchableOpacity`
 	border-radius: 10%;
 	background-color: green;
-	width: 25%;
-	height: 33%;
-	margin-left: 5%;
+	width: 75%;
+	height: 30%;
 	align-items: center;
 	align-content: center;
 	padding: 2%;
 `;
-const FilterButtonPassenger = styled.TouchableOpacity`
-	${"" /* position: absolute; */}
-	margin-top: 3%;
-	border-radius: 10%;
-	background-color: green;
-	width: 35%;
-	height: 45%;
-	margin-left: 50%;
-	align-items: center;
-	padding: 1%;
-`;
+
 const TextButton = styled.Text`
 	color: white;
-	text-align: "center";
-`;
-const FirstBlock = styled.View`
-	margin-top: 10%;
+	text-align: center;
+	font-weight: 500;
+	font-size: 20%;
 `;
 
 export default RideHistory;

@@ -17,21 +17,50 @@ import {
 	selectStand,
 	selectmatchRide,
 	selectcommentedId,
+	selectreviewId,
 } from "../slices/ReviewSlice";
 
 const ReviewPart = () => {
 	const stand = useSelector(selectStand);
 	const matchRide = useSelector(selectmatchRide);
 	const commentedId = useSelector(selectcommentedId);
+	const reviewId = useSelector(selectreviewId);
 	console.log("------------------------");
 	console.log(typeof stand, stand);
 	console.log(typeof matchRide, matchRide);
 	console.log(typeof commentedId, commentedId);
+	const [initialComment, setInitialComment] = useState();
 	const [defaultRating, setdefaultRating] = useState(0);
 	const [maxRating] = useState([1, 2, 3, 4, 5]);
 	const [input, setInput] = useState("");
-	// const ID = useSelector(selectID);
+	
+ 
+ 
+	 
 
+	useEffect(()=>{
+		if(stand=="driver"){
+			axios
+			.post(`${config.KMALAE_DOMAIN}/api/review/getReviewInfo`, {
+				reviewID: reviewId,
+				stance: stand,
+			})
+			.then((response)=> {
+			setdefaultRating(response.data.driverRated)
+			setInitialComment(response.data.driverCommented)
+		})
+		}else{
+			axios
+			.post(`${config.KMALAE_DOMAIN}/api/review/getReviewInfo`, {
+				reviewID: reviewId,
+				stance: stand,
+			}).then((response)=> {
+				setdefaultRating(response.data.passengerRated)
+				setInitialComment(response.data.passengerCommented)
+			})
+		}
+	},[])
+	 
 	const CustomRatingBar = () => {
 		return (
 			<View style={styles.CustomerRatingBarStyle}>
@@ -54,13 +83,11 @@ const ReviewPart = () => {
 		);
 	};
 
+
+
 	const fetchData = async () => {
 		if (stand == "driver") {
-			// console.log("Entered Here")
-			// console.log(typeof(matchRide), {matchRide})
-			// console.log(typeof(commentedId), {commentedId})
-			// console.log(typeof(defaultRating), defaultRating)
-			// console.log(input)
+
 			await axios
 				.post(`${config.KMALAE_DOMAIN}/api/review/updateDriverReview`, {
 					passengerID: commentedId.toString(),
@@ -68,19 +95,26 @@ const ReviewPart = () => {
 					driverRating: defaultRating,
 					driverComment: input,
 				})
+				// .then((response)=>setComm(response.data.driverCommented))
 				.then((response) => console.log(response.data))
-				.catch((error) => {
-					console.log(error.response.data.errors);
-				});
+				// .catch((error) => {
+				// 	console.log(error.response.data.errors);
+				// });
+		
 		} else {
+			console.log("Entered Here")
+			console.log({defaultRating, input})
 			await axios
 				.post(`${config.KMALAE_DOMAIN}/api/review/updatePassengerReview`, {
 					driverID: commentedId.toString(),
 					matchRequestID: matchRide.toString(),
-					passangerRating: defaultRating,
-					passangerComment: input,
+					passengerRating: defaultRating,
+					passengerComment: input,
 				})
-				.then((response) => console.log(response.data));
+				.then((response) => console.log(response.data))
+				.catch((error) => {
+					console.log(error.response.data.errors);
+				});
 		}
 	};
 
@@ -99,7 +133,9 @@ const ReviewPart = () => {
 						multiline={true}
 						numberOfLines={18}
 						placeholder="Comment . . . ."
-						placeholderTextColor="grey"></TextInput>
+						placeholderTextColor="grey"> 
+						{initialComment}
+						</TextInput>
 				</InputContainer>
 				<TouchableOpacity
 					onPress={() => fetchData()}
@@ -133,6 +169,7 @@ const styles = StyleSheet.create({
 		marginTop: 15,
 		textAlign: "center",
 		fontSize: 22,
+		color: "white"
 	},
 	buttonTextStyle: {
 		textAlign: "center",
@@ -178,6 +215,7 @@ const RatingContainer = styled.View`
 	}
 	height: 100%;
 	width: 100%;
+	background-color: black;
 `;
 
 export default ReviewPart;

@@ -1,8 +1,8 @@
 import React from "react";
-import { Text, Image, StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styled from "styled-components/native";
-import { AntDesign } from "@expo/vector-icons";
+import { Icon } from "react-native-elements";
 
 const data = [
 	{
@@ -21,58 +21,57 @@ const data = [
 
 const RideLiftOptions = () => {
 	const navigation = useNavigation();
+
 	return (
 		<OptionsContainer>
 			<OptionsTouchOpacity
 				onPress={() =>
-					navigation.navigate("GetRide", { isUpdating: false })
-				}>
+					navigation.navigate("RideRequestScreen", { isUpdating: false })
+				}
+			>
 				<Image
 					style={RideLiftStyle.image}
 					source={require("../../assets/images/ride.png")}
 				/>
-				<Text style={RideLiftStyle.text}>Get Ride</Text>
-				<AntDesign
-					style={RideLiftStyle.icon}
-					name="rightcircleo"
-					size={24}
-					color="black"
-				/>
+				<TextContainer>Get Ride</TextContainer>
+				<Icon name="chevron-right" type="fontawesome" size={28} color="white" />
 			</OptionsTouchOpacity>
 
 			<OptionsTouchOpacity
 				onPress={() =>
 					navigation.navigate("ShowAllUserVehicles", { isUpdating: false })
-				}>
+				}
+			>
 				<Image
 					style={RideLiftStyle.image}
 					source={require("../../assets/images/lift.png")}
 				/>
-				<Text style={RideLiftStyle.text}>Give Ride</Text>
-				<AntDesign
-					style={RideLiftStyle.icon}
-					name="rightcircleo"
-					size={24}
-					color="black"
-				/>
+				<TextContainer>Give Ride</TextContainer>
+				<Icon name="chevron-right" type="fontawesome" size={28} color="white" />
 			</OptionsTouchOpacity>
 		</OptionsContainer>
 	);
 };
 
 const OptionsContainer = styled.SafeAreaView`
+	width: 400px;
+	height: 40%;
 	display: flex;
 	flex-direction: row;
-	justifycontent: center;
-	alignitems: center;
-	margintop: 10%;
+	justify-content: space-around;
+	align-items: center;
+	margin-top: 10%;
 `;
 const OptionsTouchOpacity = styled.TouchableOpacity`
-	background-color: #d1d3d4;
-	border-radius: 4px;
-	width: 40%;
-	padding: 5% 0 5% 0;
-	margin: 0 auto;
+	background-color: #1b6285;
+	border-radius: 10%;
+	width: 150px;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5% 0;
 `;
 
 const RideLiftStyle = StyleSheet.create({
@@ -80,26 +79,16 @@ const RideLiftStyle = StyleSheet.create({
 		resizeMode: "contain",
 		width: 90,
 		height: 90,
-		marginLeft: 25,
 		display: "flex",
 		flexDirection: "row",
 	},
-
-	text: {
-		marginTop: 10,
-		marginLeft: 25,
-	},
-
-	icon: {
-		marginTop: 18,
-		marginLeft: 25,
-	},
-
-	bar: {
-		width: 150,
-		height: 210,
-		backgroundColor: "#D1D3D4",
-		borderRadius: 4,
-	},
 });
+
+const TextContainer = styled.Text`
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 20px;
+	color: white;
+`;
+
 export default RideLiftOptions;

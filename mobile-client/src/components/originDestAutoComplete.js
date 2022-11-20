@@ -5,22 +5,25 @@ import { GOOGLE_MAPS_APIKEY } from "@env";
 import { setOrigin, setDestination } from "../slices/RideLiftSlice";
 import { useDispatch } from "react-redux";
 import { Input } from "react-native-elements";
+import styled from "styled-components";
 
 export default function OriginDestinationAutoComplete(props) {
 	const dispatch = useDispatch();
 	const showDestAlways = props.showDestAlways;
-	const [isShowingDestinationSearch, setIsShowingDestinationSearch] = useState(
-		showDestAlways ? true : false
-	);
+	// const [isShowingDestinationSearch, setIsShowingDestinationSearch] = useState(
+	// 	showDestAlways ? true : false
+	// );
+	const [isShowingDestinationSearch, setIsShowingDestinationSearch] =
+		useState(true);
 
 	return (
-		<View style={{ zIndex: 10 }}>
+		<GooglePlacesAutocompleteContainer>
 			<GooglePlacesAutocomplete
-				placeholder="Pick-up place"
+				placeholder="Pick-up Location"
 				nearbyPlacesAPI="GooglePlacesSearch"
 				debounce={400}
 				autoFocus={false}
-				styles={styles.originSearch}
+				styles={styles.PickupPointInputStyle}
 				textInputProps={{
 					onChangeText: (text) => {
 						text ? setIsShowingDestinationSearch(false) : 1;
@@ -55,10 +58,10 @@ export default function OriginDestinationAutoComplete(props) {
 
 			{isShowingDestinationSearch && (
 				<GooglePlacesAutocomplete
-					placeholder="Drop-off Place"
+					placeholder="Drop-off Location"
 					nearbyPlacesAPI="GooglePlacesSearch"
 					debounce={400}
-					styles={styles.destinationSearch}
+					styles={styles.DestinationInputStyle}
 					onPress={(data, details) => {
 						dispatch(
 							setDestination({
@@ -87,21 +90,17 @@ export default function OriginDestinationAutoComplete(props) {
 					}}
 				/>
 			)}
-		</View>
+		</GooglePlacesAutocompleteContainer>
 	);
 }
 
 const styles = StyleSheet.create({
-	originSearch: {
+	PickupPointInputStyle: {
 		container: {
-			flex: 0,
-			top: 41,
-			zIndex: 999,
 			width: "90%",
-			height: 300,
-			left: "5%",
-			right: "5%",
 			position: "absolute",
+			marginTop: "15%",
+			zIndex: 1,
 		},
 
 		originSearchNotFocus: {
@@ -116,20 +115,26 @@ const styles = StyleSheet.create({
 			fontSize: 18,
 		},
 	},
-
-	destinationSearch: {
+	DestinationInputStyle: {
 		container: {
-			flex: 0,
-			top: 91,
-			zIndex: 999,
 			width: "90%",
-			height: 300,
-			left: "5%",
-			right: "5%",
 			position: "absolute",
+			marginTop: "30%",
+			zIndex: 1,
 		},
 		textinput: {
 			fontSize: 18,
 		},
 	},
 });
+
+const GooglePlacesAutocompleteContainer = styled.View`
+	width: 100%;
+	height: 40%;
+	z-index: 1;
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+`;

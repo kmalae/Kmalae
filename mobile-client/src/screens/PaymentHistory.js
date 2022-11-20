@@ -15,90 +15,115 @@ import tw from "tailwind-react-native-classnames";
 import CurrentAmountInfo from "../components/CurrentAmountInfo";
 import { useDispatch } from "react-redux";
 import {
-	// setId,
-	setImage,
+	setdriverId,
+	setmatchId,
+	setAvatarID,
 	setName,
 	setDestination,
 	setAmount,
 	setTravelTimeInformation,
 } from "../slices/PaymentSlice";
+import { ScrollView } from "react-native-gesture-handler";
+
+import { AvatarImages } from "../../Avatars";
 
 const PaymentHistory = () => {
-	const [paymentInfo, setPaymentInfo] = useState();
+	const [paymentInfo, setPaymentInfo] = useState(null);
 	const dispatch = useDispatch();
-	const navigation = useNavigation();
+	const navigator = useNavigation();
 
 	useEffect(() => {
 		axios
-			.get(`${config.KMALAE_DOMAIN}/api/payment/getPaymentInfo`, {
-				id: "63590e11f5fdd2a3ba3d1c4f",
-				email: "passenger@kmalae.com",
-			})
-			.then((response) => console.log(response.data));
-		// .then(response=> setPaymentInfo(response.data))
-		// .then(response=>console.log(response.data)).catch((error) => {
-		// 	console.log(error.response.data.errors)
-		// 	});
+			.get(`${config.KMALAE_DOMAIN}/api/payment/getPaymentInfo`)
+			.then((response) => {
+				setPaymentInfo(response.data);
+			});
 	}, []);
 
-	const paymentDetails = ({ item }) => (
-		<Item
-			onPress={() => {
-				dispatch(setImage(require(`../../assets/images/sizer/person0${3}.png`)));
-				dispatch(setName(item.name));
-				dispatch(setDestination(item.destination));
-				dispatch(setAmount(item.amount));
-				dispatch(setTravelTimeInformation(item.date));
-				navigation.navigate("PaymentScreen");
-			}}>
-			<AvatarContainer>
-				<Image source={item.image} style={styles.avatar} />
-			</AvatarContainer>
-			<DetailsItem>
-				<NameText>
-					{item.driver.firstName} {item.driver.lastName}
-				</NameText>
-				<AmountText>{item.amount}</AmountText>
-				<DestinationText>{item.destination}</DestinationText>
-				<DestinationText>{item.date}</DestinationText>
-
-				{/* <NameText>{item.passenger.firstName} {item.passenger.lastName}</NameText>
-					<AmountText>{item.payment.amountPaid/100} AED</AmountText>
-					<DestinationText>{new Date(item.matchRide.timeOfDeparture).toLocaleDateString()}</DestinationText>
-					<DestinationText>{item.matchRide.destination.lat} + {item.matchRide.destination.lng}</DestinationText> */}
-			</DetailsItem>
-			<PayButton
-				onPress={() => {
-					navigation.navigate("PaymentScreen");
-				}}>
-				<PayText>Pay</PayText>
-			</PayButton>
-		</Item>
-	);
-
-	listSeparator = () => {
-		return <View style={styles.separator} />;
-	};
-
-	return (
-		<View>
+	return paymentInfo !== null ? (
+		<>
 			<View style={tw`h-1/3`}>
 				<CurrentAmountInfo />
 			</View>
 			<View style={tw`h-2/3`}>
 				<ReviewerDetails>
-					<FlatList
-						ListHeaderComponentStyle={styles.listHeader}
-						data={paymentInfo}
-						renderItem={paymentDetails}
-						ItemSeparatorComponent={listSeparator}
-					/>
-					<TouchableOpacity activeOpacity={0.7} style={styles.buttonStyle}>
+					<ScrollView>
+						{paymentInfo.map((item) => {
+							let imageURI;
+							AvatarImages.map(({ id, image }) => {
+								if (id == item.driver.avatarID) imageURI = image;
+							});
+							return (
+								<Item key={item.id}>
+									<AvatarContainer>
+										<Image
+											source={{
+												uri: Image.resolveAssetSource(imageURI).uri,
+											}}
+											style={styles.avatar}
+										/>
+									</AvatarContainer>
+									<DetailsItem>
+										<NameText>
+											{item.driver.firstName} {item.driver.lastName}
+										</NameText>
+										<AmountText>
+											{item.amountPaid / 100} AED
+										</AmountText>
+										<DestinationText>
+											{item.destination.lat} {item.destination.lng}
+										</DestinationText>
+										<DestinationText>
+											{new Date(item.createdAt).toLocaleDateString()}
+										</DestinationText>
+									</DetailsItem>
+									<PayButton
+										onPress={() => {
+											dispatch(setdriverId(item.driver.id));
+											dispatch(setmatchId(item.id));
+											dispatch(setAvatarID(item.driver.avatarID));
+											dispatch(
+												setName(
+													item.driver.firstName +
+														" " +
+														item.driver.lastName
+												)
+											);
+											dispatch(
+												setDestination(
+													item.destination.lat +
+														" " +
+														item.destination.lng
+												)
+											);
+											dispatch(setAmount(item.amountPaid));
+											dispatch(
+												setTravelTimeInformation(
+													new Date(
+														item.createdAt
+													).toLocaleDateString()
+												)
+											);
+
+											navigator.navigate("PaymentScreen");
+										}}>
+										<PayText>Pay</PayText>
+									</PayButton>
+								</Item>
+							);
+						})}
+					</ScrollView>
+					<TouchableOpacity
+						activeOpacity={0.7}
+						style={styles.buttonStyle}
+						onPress={() => navigator.navigate("TopupScreen")}>
 						<Text style={styles.buttonTextStyle}>Top up</Text>
 					</TouchableOpacity>
 				</ReviewerDetails>
 			</View>
-		</View>
+		</>
+	) : (
+		<></>
 	);
 };
 
@@ -166,7 +191,7 @@ const PayText = styled.Text`
 `;
 const DetailsItem = styled.View`
 	height: 100%;
-	width: 70%;
+	width: 85%;
 	margin-left: 20%;
 	margin-top: 5%;
 	margin-bottom: 35%;
@@ -183,7 +208,7 @@ const NameText = styled.Text`
 const AmountText = styled.Text`
 	font-weight: 600;
 	font-size: 12px;
-	margin-left: 80%;
+	margin-left: 75%;
 	position: absolute;
 	color: white;
 `;
@@ -282,7 +307,7 @@ const PayButton = styled.TouchableOpacity`
 	background-color: green;
 	width: 15%;
 	height: 35%;
-	margin-left: 70%;
+	margin-left: 75%;
 	margin-top: 12%;
 	align-items: center;
 	padding: 1%;

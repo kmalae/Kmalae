@@ -1,16 +1,8 @@
-import {
-	View,
-	Text,
-	StyleSheet,
-	ImageBackground,
-	SafeAreaView,
-	TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, ImageBackground } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { Image, Icon } from "react-native-elements";
 import styled from "styled-components";
 import axios from "axios";
 import config from "../../config";
@@ -18,6 +10,7 @@ import config from "../../config";
 // importing navigations
 import Main from "../navigations/topup-navigations/Main";
 import Topup from "../navigations/topup-navigations/Topup";
+import TopupHistory from "../navigations/topup-navigations/TopupHistory";
 
 // importing slices
 import { selectCurrentUser, setCurrentUser } from "../slices/CurrentUserSlice";
@@ -27,41 +20,36 @@ import {
 	selectPoints,
 	setPoints,
 	setTopupHistory,
+	selectTopupHistory,
 } from "../slices/TopupSlice";
 
 const TopupScreen = () => {
 	const dispatch = useDispatch();
 	const [delay, setDelay] = useState(true);
 	const Stack = createNativeStackNavigator();
-	const navigator = useNavigation();
 
-	const currentUser = useSelector(selectCurrentUser);
 	const points = useSelector(selectPoints);
 	const amountToTopup = useSelector(selectAmountToTopup);
 
 	useEffect(() => {
-		axios
-			.post(`${config.KMALAE_DOMAIN}/api/users/signin`, {
-				email: "passenger@kmalae.com",
-				password: "password",
-			})
-			.then((result) => {
-				axios
-					.get(`${config.KMALAE_DOMAIN}/api/users/currentUser`)
-					.then((result) => {
-						dispatch(setCurrentUser(result.data));
-					});
-			});
-		setTimeout(() => {
-			axios
-				.get(`${config.KMALAE_DOMAIN}/api/topup/getUserTopups`)
-				.then((result) => {
-					dispatch(setPoints(result.data.points));
-					dispatch(setTopupHistory(result.data.TopupsPerformed));
-				})
-				.catch((error) => console.log(error.response.data.errors));
-		}, 300);
+		getUserTopup();
 	}, []);
+
+	const getUserTopup = () => {
+		axios
+			.get(`${config.KMALAE_DOMAIN}/api/topup/getUserTopups`)
+			.then((result) => {
+				dispatch(setPoints(result.data.points));
+				dispatch(
+					setTopupHistory(
+						result.data.TopupsPerformed.sort((topup_1, topup_2) =>
+							topup_1.toppedAt > topup_2.toppedAt ? -1 : 1
+						)
+					)
+				);
+			})
+			.catch((error) => console.log(error.response.data.errors));
+	};
 
 	const expectedAmountCalculator = () => {
 		let sum = parseInt(points) + parseFloat(amountToTopup) * 100;
@@ -71,21 +59,23 @@ const TopupScreen = () => {
 	return (
 		<View style={styles.outerContainer}>
 			<ImageBackground
-				source={require("../../assets/images/kmalae-bg.png")}
-				style={styles.backgroundImage}></ImageBackground>
+				source={require("../../assets/images/kmalae-bg-2.jpg")}
+				style={styles.backgroundImage}
+			></ImageBackground>
 			<View style={styles.fader}></View>
 			<View style={styles.container}>
 				<BalanceContainer>
 					<TextContainer
 						style={{
 							fontSize: 40,
-						}}>
+						}}
+					>
 						AED
 					</TextContainer>
 					<AmountAvailable>
-						{points && (
+						{points != null && (
 							<>
-								<TextContainer style={{ fontSize: 150 }}>
+								<TextContainer style={{ fontSize: 140 }}>
 									{Math.floor(
 										(parseInt(points) / 100).toLocaleString("en-US", {
 											minimumIntegerDigits: 2,
@@ -122,16 +112,25 @@ const TopupScreen = () => {
 							name="Main"
 							options={{
 								headerShown: false,
-							}}>
+							}}
+						>
 							{(props) => <Main delay={delay} setDelay={setDelay} />}
 						</Stack.Screen>
-
 						<Stack.Screen
 							name="Topup"
 							options={{
 								headerShown: false,
-							}}>
+							}}
+						>
 							{(props) => <Topup delay={delay} setDelay={setDelay} />}
+						</Stack.Screen>
+						<Stack.Screen
+							name="TopupHistory"
+							options={{
+								headerShown: false,
+							}}
+						>
+							{(props) => <TopupHistory delay={delay} setDelay={setDelay} />}
 						</Stack.Screen>
 					</Stack.Navigator>
 				</StackNavigationContainer>
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		zIndex: 1,
 		backgroundColor: "black",
-		opacity: 0.9,
+		opacity: 0.7,
 	},
 	container: {
 		flex: 1,

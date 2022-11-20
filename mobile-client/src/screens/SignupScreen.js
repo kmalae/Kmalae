@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	ImageBackground,
 	Text,
+	KeyboardAvoidingView,
 } from "react-native";
 import styled from "styled-components";
 import config from "../../config";
@@ -23,15 +24,10 @@ import {
 	selectDOB,
 	selectIDNumber,
 	selectPhoneNumber,
-} from "../slices/FirstFormSlice";
-
-import {
 	selectEmail,
 	selectPassword,
-	selectConfirmPassword,
-} from "../slices/SecondFormSlice";
-
-import { selectUserImage } from "../slices/ThirdFormSlice";
+	selectAvatarID,
+} from "../slices/SignupSlice";
 
 import {
 	selectFirstNameError,
@@ -48,36 +44,30 @@ import {
 	setSecondFormFilled,
 } from "../slices/SignupErrorMessagesSlice";
 
-const transitionConfig = {
-	animation: "spring",
-	config: {
-		stiffness: 1000,
-		damping: 500,
-		mass: 3,
-		overshootClamping: true,
-		restDisplacementThreshold: 0.1,
-		restSpeedThreshold: 0.1,
-	},
-};
+import {
+	selectTransitionDelay,
+	setTransitionDelay,
+} from "../slices/CommonSlice";
 
 const SignupScreen = () => {
-	const [delay, setDelay] = useState(true);
+	const dispatch = useDispatch();
+
+	const transitionDelay = useSelector(selectTransitionDelay);
+
 	const Stack = createNativeStackNavigator();
 	const navigator = useNavigation();
-	const dispatch = useDispatch();
 
 	const [formLoaded, setFormLoaded] = useState("first");
 
 	// User credentials
 	const email = useSelector(selectEmail);
 	const password = useSelector(selectPassword);
-	const confirmPassword = useSelector(selectConfirmPassword);
 	const firstName = useSelector(selectFirstName);
 	const lastName = useSelector(selectLastName);
 	const DOB = useSelector(selectDOB);
 	const IDNumber = useSelector(selectIDNumber);
 	const phoneNumber = useSelector(selectPhoneNumber);
-	const userImage = useSelector(selectUserImage);
+	const avatarID = useSelector(selectAvatarID);
 
 	const firstNameError = useSelector(selectFirstNameError);
 	const lastNameError = useSelector(selectLastNameError);
@@ -91,6 +81,13 @@ const SignupScreen = () => {
 
 	const firstFormFilled = useSelector(selectFirstFormFilled);
 	const secondFormFilled = useSelector(selectSecondFormFilled);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			dispatch(setTransitionDelay(false));
+		}, 500);
+		return () => clearTimeout(timer);
+	}, [transitionDelay]);
 
 	useEffect(() => {
 		if (
@@ -125,140 +122,130 @@ const SignupScreen = () => {
 	}, [emailError, passwordError, confirmPasswordError]);
 
 	const registerUser = () => {
-		const userData = new FormData();
-		userData.append("email", email.trim());
-		userData.append("password", password.trim());
-		userData.append("firstName", firstName.trim());
-		userData.append("lastName", lastName.trim());
-		userData.append("IDNumber", IDNumber);
-		userData.append("dateOfBirth", DOB);
-		userData.append("phoneNumber", phoneNumber);
-		userData.append("userImage", userImage);
-		console.log({ userImage });
-
 		axios
-			.post(`${config.KMALAE_DOMAIN}/api/users/signup`, userData)
+			.post(`${config.KMALAE_DOMAIN}/api/users/signup`, {
+				email: email.trim().toLowerCase(),
+				password: password,
+				firstName: firstName.trim().toLowerCase(),
+				lastName: lastName.trim().toLowerCase(),
+				IDNumber,
+				dateOfBirth: DOB,
+				phoneNumber,
+				avatarID,
+			})
 			.then((response) => {
-				console.log(response.headers);
-				console.log("###################################");
-				console.log(response.data);
+				dispatch(setTransitionDelay(true));
+				navigator.replace("VehicleRegistration");
 			})
 			.catch((error) => console.log(error.response.data.errors));
 	};
 
-	return (
-		<View style={styles.outerContainer}>
-			<ImageBackground
-				source={require("../../assets/images/kmalae-bg.png")}
-				style={styles.backgroundImage}></ImageBackground>
-			<View style={styles.fader}></View>
-			<SafeAreaView style={styles.container}>
-				<FormContainer>
-					<ProgressBarContainer>
-						<ProgressEndPoints style={{ backgroundColor: "green" }} />
-						<ProgressRoute
-							style={{
-								backgroundColor: `${
-									formLoaded === "first" ? "lightgray" : "green"
-								}`,
-							}}
-						/>
-						<ProgressEndPoints
-							style={{
-								backgroundColor: `${
-									formLoaded in { second: "second", third: "third" }
-										? "green"
-										: "lightgray"
-								}`,
-							}}
-						/>
-						<ProgressRoute
-							style={{
-								backgroundColor: `${
-									formLoaded === "third" ? "green" : "lightgray"
-								}`,
-							}}
-						/>
-						<ProgressEndPoints
-							style={{
-								backgroundColor: `${
-									formLoaded === "third" ? "green" : "lightgray"
-								}`,
-							}}
-						/>
-					</ProgressBarContainer>
+	return !transitionDelay ? (
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+			keyboardVerticalOffset={Platform.OS === "ios" ? -64 : 0}>
+			<View style={styles.outerContainer}>
+				<ImageBackground
+					source={require("../../assets/images/kmalae-bg-2.jpg")}
+					style={styles.backgroundImage}></ImageBackground>
+				<View style={styles.fader}></View>
+				<SafeAreaView style={styles.container}>
+					<FormContainer>
+						<ProgressBarContainer>
+							<ProgressEndPoints style={{ backgroundColor: "green" }} />
+							<ProgressRoute
+								style={{
+									backgroundColor: `${
+										formLoaded === "first" ? "lightgray" : "green"
+									}`,
+								}}
+							/>
+							<ProgressEndPoints
+								style={{
+									backgroundColor: `${
+										formLoaded in { second: "second", third: "third" }
+											? "green"
+											: "lightgray"
+									}`,
+								}}
+							/>
+							<ProgressRoute
+								style={{
+									backgroundColor: `${
+										formLoaded === "third" ? "green" : "lightgray"
+									}`,
+								}}
+							/>
+							<ProgressEndPoints
+								style={{
+									backgroundColor: `${
+										formLoaded === "third" ? "green" : "lightgray"
+									}`,
+								}}
+							/>
+						</ProgressBarContainer>
 
-					<Stack.Navigator style={{ overflowY: "scroll" }}>
-						<Stack.Screen
-							name="FirstSignupForm"
-							options={{
-								headerShown: false,
-							}}>
-							{(props) => (
-								<FirstSignupForm
-									{...props}
-									delay={delay}
-									setDelay={setDelay}
-								/>
-							)}
-						</Stack.Screen>
-						<Stack.Screen
-							name="SecondSignupForm"
-							options={{
-								headerShown: false,
-							}}>
-							{(props) => (
-								<SecondSignupForm
-									{...props}
-									delay={delay}
-									setDelay={setDelay}
-								/>
-							)}
-						</Stack.Screen>
-						<Stack.Screen
-							name="ThirdSignupForm"
-							options={{
-								headerShown: false,
-							}}>
-							{(props) => (
-								<ThirdSignupForm
-									{...props}
-									delay={delay}
-									setDelay={setDelay}
-								/>
-							)}
-						</Stack.Screen>
-					</Stack.Navigator>
+						<Stack.Navigator>
+							<Stack.Screen
+								name="FirstSignupForm"
+								options={{
+									headerShown: false,
+								}}>
+								{(props) => <FirstSignupForm {...props} />}
+							</Stack.Screen>
 
-					<SignupButtonComponent
-						formLoaded={formLoaded}
-						setFormLoaded={setFormLoaded}
-						setDelay={setDelay}
-						navigator={navigator}
-						firstFormFilled={firstFormFilled}
-						secondFormFilled={secondFormFilled}
-						registerUser={registerUser}
-					/>
+							<Stack.Screen
+								name="SecondSignupForm"
+								options={{
+									headerShown: false,
+								}}>
+								{(props) => <SecondSignupForm {...props} />}
+							</Stack.Screen>
 
-					<NavigateToSigninButton>
-						<Text
-							style={{ color: "white", fontSize: 18, marginRight: 10 }}>
-							Already have an account?
-						</Text>
-						<Text
-							style={{
-								color: "aqua",
-								fontSize: 18,
-							}}
-							onPress={() => {
-								navigator.navigate("LoginScreen");
-							}}>
-							Signin
-						</Text>
-					</NavigateToSigninButton>
-				</FormContainer>
-			</SafeAreaView>
-		</View>
+							<Stack.Screen
+								name="ThirdSignupForm"
+								options={{
+									headerShown: false,
+								}}>
+								{(props) => <ThirdSignupForm {...props} />}
+							</Stack.Screen>
+						</Stack.Navigator>
+						<SignupButtonComponent
+							formLoaded={formLoaded}
+							setFormLoaded={setFormLoaded}
+							navigator={navigator}
+							firstFormFilled={firstFormFilled}
+							secondFormFilled={secondFormFilled}
+							registerUser={registerUser}
+						/>
+
+						<NavigateToSigninButton>
+							<Text
+								style={{
+									color: "white",
+									fontSize: 18,
+									marginRight: 10,
+								}}>
+								Already have an account?
+							</Text>
+							<Text
+								style={{
+									color: "aqua",
+									fontSize: 18,
+								}}
+								onPress={() => {
+									navigator.navigate("LoginScreen");
+								}}>
+								Signin
+							</Text>
+						</NavigateToSigninButton>
+					</FormContainer>
+				</SafeAreaView>
+			</View>
+		</KeyboardAvoidingView>
+	) : (
+		<></>
 	);
 };
 
@@ -286,27 +273,26 @@ const styles = StyleSheet.create({
 		left: 0,
 		zIndex: 1,
 		backgroundColor: "black",
-		opacity: 0.9,
+		opacity: 0.7,
 	},
 	container: {
 		flex: 1,
 		zIndex: 3,
 		display: "flex",
-		justifyContent: "flex-end",
+		flexDirection: "column",
+		justifyContent: "flex-start",
 		alignItems: "center",
 	},
 });
 
 const FormContainer = styled.View`
 	height: 75%;
-	width: 90%;
+	width: 400px;
+	margin-top: 10%;
 	z-index: 4;
-	margin-bottom: 35%;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
-	padding: 5% 8%;
-	border-radius: 10px;
 `;
 
 const ProgressBarContainer = styled.View`
@@ -331,6 +317,8 @@ const ProgressRoute = styled.View`
 `;
 
 const SignupButtonComponent = ({ registerUser, ...props }) => {
+	const transitionDelay = useSelector(selectTransitionDelay);
+
 	const canAdvance = () => {
 		if (props.formLoaded === "first") return !props.firstFormFilled;
 		else if (props.formLoaded === "second") return !props.secondFormFilled;
@@ -344,11 +332,11 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 						if (props.formLoaded === "second") {
 							props.setFormLoaded("first");
 							props.navigator.navigate("FirstSignupForm");
-							props.setDelay(true);
+							setTransitionDelay(true);
 						} else {
 							props.setFormLoaded("second");
 							props.navigator.navigate("SecondSignupForm");
-							props.setDelay(true);
+							setTransitionDelay(true);
 						}
 					}}>
 					<Icon
@@ -364,14 +352,14 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 					if (props.formLoaded === "first") {
 						if (props.firstFormFilled) {
 							props.setFormLoaded("second");
-							props.setDelay(true);
 							props.navigator.navigate("SecondSignupForm");
+							setTransitionDelay(true);
 						}
 					} else if (props.formLoaded === "second") {
 						if (props.secondFormFilled) {
 							props.setFormLoaded("third");
-							props.setDelay(true);
 							props.navigator.navigate("ThirdSignupForm");
+							setTransitionDelay(true);
 						}
 					} else {
 						registerUser();
@@ -384,10 +372,10 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 						props.formLoaded === "first"
 							? props.firstFormFilled
 								? 1
-								: 0.7
+								: 0.6
 							: props.secondFormFilled
 							? 1
-							: 0.7,
+							: 0.6,
 				}}>
 				<Text style={{ fontSize: 25, color: "white" }}>
 					{props.formLoaded !== "third" ? "Next" : "Register"}
@@ -398,10 +386,11 @@ const SignupButtonComponent = ({ registerUser, ...props }) => {
 };
 
 const SignupButtonContainer = styled.View`
-	width: 100%;
-	height: 50px;
+	height: 55px;
+	width: 310px;
 	margin-top: 10px;
 	padding: 0%;
+	align-self: center;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -432,6 +421,7 @@ const NavigateToSigninButton = styled.View`
 	width: 100%;
 	margin-top: 15px;
 	display: flex;
+	align-self: center;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;

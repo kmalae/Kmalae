@@ -4,38 +4,39 @@ import {
 	SafeAreaView,
 	StyleSheet,
 	ImageBackground,
-	TextInput,
 	Text,
-	TouchableOpacity,
-	Button,
-	Pressable,
+	Dimensions,
+	KeyboardAvoidingView,
 } from "react-native";
-import styled, { withTheme } from "styled-components";
+import styled from "styled-components";
 import { Icon } from "react-native-elements";
 import config from "../../config";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 
-import HomeScreen from "../screens/HomeScreen";
+import { selectWidth, selectHeight } from "../slices/CommonSlice";
+import { useSelector } from "react-redux";
+
+var deviceWidth;
+var deviceHeight;
 
 const LoginScreen = () => {
 	const [userEmail, setUserEmail] = useState("");
 	const [userPassword, setUserPassword] = useState("");
 	const navigator = useNavigation();
 
+	const deviceWidth = useSelector(selectWidth);
+	const deviceHeight = useSelector(selectHeight);
+
 	useEffect(() => {
-		console.log(config.KMALAE_DOMAIN);
 		axios
 			.get(`${config.KMALAE_DOMAIN}/api/users/currentuser`)
 			.then((response) => {
-				console.log(response.data);
-				const data = response.data;
-				if (data.currentUser === null) {
-					return;
-				} else {
-					navigator.navigate("LoginScreen");
+				if (response.data.currentUser !== null) {
+					navigator.replace("PaymentHistory");
 				}
-			});
+			})
+			.catch((error) => console.log(error.response.data.errors));
 	}, []);
 
 	// Functions
@@ -45,64 +46,72 @@ const LoginScreen = () => {
 				email: userEmail,
 				password: userPassword,
 			})
-			.then((response) => navigator.navigate("PaymentScreen"))
+			.then((response) => navigator.replace("HomeScreen"))
 			.catch((error) => console.log(error.response.data.errors));
 	};
 
 	return (
-		<View style={styles.outerContainer}>
-			<ImageBackground
-				source={require("../../assets/images/kmalae-bg.png")}
-				style={styles.backgroundImage}></ImageBackground>
-			<View style={styles.fader}></View>
-			<SafeAreaView style={styles.container}>
-				<FormContainer>
-					<StyledTextInput
-						icon="email"
-						placeholder="Email"
-						placeholderTextColor="gray"
-						returnKeyType="done"
-						isPassword={false}
-						userEmail={userEmail}
-						setUserEmail={setUserEmail}
-					/>
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+			keyboardVerticalOffset={Platform.OS === "ios" ? -64 : 0}>
+			<View style={styles.outerContainer}>
+				<ImageBackground
+					source={require("../../assets/images/kmalae-bg-2.jpg")}
+					style={styles.backgroundImage}></ImageBackground>
+				<View style={styles.fader}></View>
+				<SafeAreaView style={styles.container}>
+					<FormContainer>
+						<StyledTextInput
+							icon="email"
+							placeholder="Email"
+							placeholderTextColor="gray"
+							returnKeyType="done"
+							isPassword={false}
+							userEmail={userEmail}
+							setUserEmail={setUserEmail}
+						/>
 
-					<StyledTextInput
-						icon="lock"
-						placeholder="Password"
-						placeholderTextColor="gray"
-						returnKeyType="done"
-						isPassword={true}
-						userPassword={userPassword}
-						setUserPassword={setUserPassword}
-					/>
+						<StyledTextInput
+							icon="lock"
+							placeholder="Password"
+							placeholderTextColor="gray"
+							returnKeyType="done"
+							isPassword={true}
+							userPassword={userPassword}
+							setUserPassword={setUserPassword}
+						/>
 
-					<StyledButton
-						onPress={() => {
-							signinUser();
-						}}>
-						<Text style={{ fontSize: 22, color: "white" }}>Signin</Text>
-					</StyledButton>
+						<StyledButton onPress={signinUser}>
+							<Text style={{ fontSize: 22, color: "white" }}>
+								Signin
+							</Text>
+						</StyledButton>
 
-					<NavigateToSignupButton>
-						<Text
-							style={{ color: "white", fontSize: 18, marginRight: 10 }}>
-							Not registered yet?
-						</Text>
-						<Text
-							style={{
-								color: "aqua",
-								fontSize: 18,
-							}}
-							onPress={() => {
-								navigator.navigate("SignupScreen");
-							}}>
-							Signup
-						</Text>
-					</NavigateToSignupButton>
-				</FormContainer>
-			</SafeAreaView>
-		</View>
+						<NavigateToSignupButton>
+							<Text
+								style={{
+									color: "white",
+									fontSize: 18,
+									marginRight: 10,
+								}}>
+								Not registered yet?
+							</Text>
+							<Text
+								style={{
+									color: "aqua",
+									fontSize: 18,
+								}}
+								onPress={() => {
+									navigator.navigate("SignupScreen");
+								}}>
+								Signup
+							</Text>
+						</NavigateToSignupButton>
+					</FormContainer>
+				</SafeAreaView>
+			</View>
+		</KeyboardAvoidingView>
 	);
 };
 
@@ -130,13 +139,14 @@ const styles = StyleSheet.create({
 		left: 0,
 		zIndex: 1,
 		backgroundColor: "black",
-		opacity: 0.9,
+		opacity: 0.7,
 	},
 	container: {
 		flex: 1,
 		zIndex: 3,
 		display: "flex",
-		justifyContent: "flex-end",
+		flexDirection: "column",
+		justifyContent: "center",
 		alignItems: "center",
 	},
 });
@@ -145,7 +155,7 @@ const FormContainer = styled.View`
 	height: 45%;
 	width: 90%;
 	z-index: 4;
-	margin-bottom: 35%;
+	margin-top: 10%;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -167,7 +177,7 @@ const StyledTextInput = ({
 	const [hidePassword, setHidePassword] = useState(true);
 
 	return (
-		<InputContainer style={isPassword && { paddingRight: 50 }}>
+		<InputContainer>
 			<LeftIcon>
 				<Icon name={icon} type="fontawesome" color="green" size={30} />
 			</LeftIcon>
@@ -199,24 +209,24 @@ const StyledTextInput = ({
 
 const InputContainer = styled.View`
 	background-color: white;
-	height: 60px;
-	width: 100%;
+	height: 55px;
+	width: 310px;
 	border-width: 2px;
 	border-radius: 10px;
 	border-color: lightgreen;
 	margin-top: 3px;
 	margin-bottom: 15px;
-	padding-left: 51px;
 	box-shadow: 3px 3px 3px green;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	position: relative;
 `;
 
 const LeftIcon = styled.View`
-	position: absolute;
-	top: 8%;
-	left: 0;
-	z-index: 9;
 	height: 80%;
-	width: 50px;
+	width: 20%;
 	border-right-width: 2px;
 	border-color: lightgray;
 	display: flex;
@@ -240,7 +250,7 @@ const RightIcon = styled.TouchableOpacity`
 const InputField = styled.TextInput`
 	background-color: white;
 	height: 100%;
-	width: 100%;
+	width: 65%;
 	border: none;
 	border-radius: 10px;
 	padding: 15px;

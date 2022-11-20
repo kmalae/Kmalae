@@ -5,14 +5,14 @@ import "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import {
 	selectTravelTimeInformation,
-	selectImage,
+	selectAvatarID,
 	selectName,
 	selectAmount,
 	selectDestination,
 } from "../slices/ReviewSlice";
 
 const UserDetails = () => {
-	const image = useSelector(selectImage);
+	const avatarID = useSelector(selectAvatarID);
 	const name = useSelector(selectName);
 	const destination = useSelector(selectDestination);
 	const amount = useSelector(selectAmount);
@@ -22,7 +22,7 @@ const UserDetails = () => {
 		<View>
 			<ReviewerDetails>
 				<FirstBlock>
-					<Image source={image}></Image>
+					<Image source={{}}></Image>
 					<Name>
 						<Text style={styles.textStyle}>{name}</Text>
 					</Name>

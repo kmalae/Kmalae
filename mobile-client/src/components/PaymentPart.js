@@ -1,31 +1,47 @@
-import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Image } from "react-native-elements";
 import styled from "styled-components";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import {
 	selectTravelTimeInformation,
-	selectImage,
+	selectAvatarID,
+	selectdriverId,
+	selectmatchId,
 	selectName,
 	selectAmount,
 	selectDestination,
 } from "../slices/PaymentSlice";
 import config from "../../config";
+import { AvatarImages } from "../../Avatars";
+import { useEffect, useState } from "react";
+
 const PaymentPart = () => {
-	const image = useSelector(selectImage);
+	const avatarID = useSelector(selectAvatarID);
+	const driverId = useSelector(selectdriverId);
+	const matchId = useSelector(selectmatchId);
 	const name = useSelector(selectName);
 	const destination = useSelector(selectDestination);
 	const amount = useSelector(selectAmount);
 	const travelTimeInformation = useSelector(selectTravelTimeInformation);
+	const [avatarImageURI, setAvatarImageURI] = useState(null);
+
+	useEffect(() => {
+		if (avatarID !== null)
+			AvatarImages.map(({ id, image }) => {
+				if (id == avatarID) setAvatarImageURI(image);
+			});
+	}, [avatarID]);
 
 	const completePayment = async () => {
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/payment/deductPoints`, {
-				driverID: "",
-				matchRequestID: "",
+				driverID: driverId,
+				matchRequestID: matchId,
 				amountPaid: amount,
 			})
-			.then((response) => console.log(response.data));
+			.then((response) => navigator.replace("ReviewScreen"))
+			.catch((error) => console.log(error.response.data.errors));
 	};
 
 	return (
@@ -35,9 +51,14 @@ const PaymentPart = () => {
 					<DriverName>Driver</DriverName>
 					<DriverImage>
 						<AvatarContainer>
-							<Image
-								source={require("../../assets/images/sizer/person02.png")}
-							/>
+							{avatarImageURI !== null && (
+								<AvatarImage
+									source={{
+										uri: Image.resolveAssetSource(avatarImageURI).uri,
+									}}
+									resizeMode="contain"
+								/>
+							)}
 						</AvatarContainer>
 					</DriverImage>
 					<DriverName>{name}</DriverName>
@@ -78,6 +99,7 @@ const styles = StyleSheet.create({
 		// fontFamily: 'serif',
 		fontWeight: "bold",
 	},
+	avatar: {},
 });
 
 const ReviewerDetails = styled.View`
@@ -206,11 +228,15 @@ const PayText = styled.Text`
 `;
 const AvatarContainer = styled.View`
 	${"" /* background-color: "#D9D9D9"; */}
-	border-radius: 100%;
-	height: 89%;
+	height: 100%;
 	width: 89%;
 	justify-content: center;
 	align-items: center;
+`;
+
+const AvatarImage = styled.Image`
+	height: 100%;
+	width: 70%;
 `;
 
 export default PaymentPart;

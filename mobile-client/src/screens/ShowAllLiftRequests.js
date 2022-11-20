@@ -1,4 +1,4 @@
-import { SafeAreaView, Text, Modal, View, Alert } from "react-native";
+import { Text, Modal, View, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
 import axios from "axios";
@@ -152,55 +152,27 @@ const ShowAllLiftRequests = () => {
 						}}>
 						<RideModalView>
 							<ModalRowView>
-								<Text>From: </Text>
-								<Text>{item.currentLocation.lat}</Text>
-								<Text>{item.currentLocation.lng}</Text>
+							<DescriptionText>FROM</DescriptionText>
+								<ValueText>{item.currentLocation.lat}{item.currentLocation.lng}</ValueText>
 							</ModalRowView>
+							<BorderLine/>
 							<ModalRowView>
-								<Text>To: </Text>
-								<Text>{item.destination.lat}</Text>
-								<Text>{item.destination.lng}</Text>
+							<DescriptionText>TO</DescriptionText>
+								<ValueText>{item.destination.lat}{item.destination.lng}</ValueText>
 							</ModalRowView>
+							<BorderLine/>
 							<ModalRowView>
-								<Text>when: </Text>
-								<Text>{formatDate(item.timeOfDeparture)}</Text>
+							<DescriptionText>TIME</DescriptionText>
+								<ValueText>{formatDate(item.timeOfDeparture)}</ValueText>
 							</ModalRowView>
+							<BorderLine/>
 							<ModalRowView>
-								<Text>Status: </Text>
-								<Text>{item.status}</Text>
+							<DescriptionText>STATUS</DescriptionText>
+								<ValueText>{item.status}</ValueText>
 							</ModalRowView>
-
-							<ButtonsModalRowView>
-								<InModalButton
-									onPress={() => {
-										onClose();
-									}}>
-									<Text>Close</Text>
-								</InModalButton>
-
-								<InModalButton
-									onPress={() => {
-										handelUpdate(
-											item.vehicle,
-											item.currentLocation,
-											item.destination,
-											item.timeOfDeparture,
-											item.id
-										);
-									}}>
-									<Text>Update</Text>
-								</InModalButton>
-
-								<InModalButton
-									onPress={() => {
-										LiftDeleteAlertMessage(item.id);
-									}}>
-									<Text>Delete</Text>
-								</InModalButton>
-							</ButtonsModalRowView>
-
-							<ButtonsModalRowView>
-								<Text>Acceptable radius in Km</Text>
+							<BorderLine/>
+							<ModalRowViewLast>
+								<DescriptionText>ACCEPTABLE RADIUS (KM)</DescriptionText>
 								<NumericInput
 									value={radius.value}
 									onChange={(value) => setRadius({ value })}
@@ -213,15 +185,43 @@ const ShowAllLiftRequests = () => {
 									step={1}
 									valueType="real"
 									rounded
-									textColor="#B0228C"
+									textColor="white"
 									iconStyle={{ color: "black" }}
-									rightButtonBackgroundColor="#a8a8a8"
+									rightButtonBackgroundColor="#D1D3D4"
 									leftButtonBackgroundColor="#D1D3D4"
 								/>
-							</ButtonsModalRowView>
-
+							</ModalRowViewLast>
+							<BorderLine/>
 							<ButtonsModalRowView>
 								<InModalButton
+									onPress={() => {
+										onClose();
+									}}>
+									<ButtonText>Close</ButtonText>
+								</InModalButton>
+
+								<InModalButton
+									onPress={() => {
+										handelUpdate(
+											item.vehicle,
+											item.currentLocation,
+											item.destination,
+											item.timeOfDeparture,
+											item.id
+										);
+									}}>
+									<ButtonText>Update</ButtonText>
+								</InModalButton>
+
+								<InModalButton
+									onPress={() => {
+										LiftDeleteAlertMessage(item.id);
+									}}>
+									<ButtonText>Delete</ButtonText>
+								</InModalButton>
+							</ButtonsModalRowView>
+							<ButtonsModalRowView>
+								<InModalButtonPotential
 									style={{ marginLeft: "auto", marginRight: "auto" }}
 									onPress={() =>
 										handleShowPassengers(
@@ -231,9 +231,12 @@ const ShowAllLiftRequests = () => {
 											radius.value
 										)
 									}>
-									<Text>Show Potential Passengers</Text>
-								</InModalButton>
+									<ButtonText>Show Potential Passengers</ButtonText>
+								</InModalButtonPotential>
 							</ButtonsModalRowView>
+					
+
+						
 						</RideModalView>
 					</Modal>
 				)}
@@ -242,9 +245,11 @@ const ShowAllLiftRequests = () => {
 	}
 
 	return (
-		<SafeAreaView>
+		<>
+		<FirstView>
 			<HeaderText>All Lift Requests</HeaderText>
-			<RideRequestsScrollView>
+			</FirstView>
+			<SecondView>
 				<RidesFlatList
 					data={serverData}
 					keyExtractor={(item) => item.id}
@@ -265,7 +270,7 @@ const ShowAllLiftRequests = () => {
 								setItemDetails(item);
 							}}>
 							<RideItem>{formatDate(timeOfDeparture)}</RideItem>
-							<Text>{status}</Text>
+							<RideItem>{status}</RideItem>
 						</RideTouchOpacity>
 					)}
 				/>
@@ -276,14 +281,15 @@ const ShowAllLiftRequests = () => {
 						setRideDetailsModalVisibility(false);
 					}}
 				/>
-			</RideRequestsScrollView>
-		</SafeAreaView>
+			</SecondView>
+		</>
 	);
 };
 
 const HeaderText = styled.Text`
-	margin: 10% auto 0 auto;
-	padding: 5% 0;
+	color: white;
+	font-weight: 600;
+	font-size: 25%;
 `;
 
 const RidesFlatList = styled.FlatList`
@@ -291,51 +297,114 @@ const RidesFlatList = styled.FlatList`
 	${"" /* border: 2px solid red; */}
 	margin: 0 auto;
 `;
-
+const FirstView = styled.View`
+	height: 20%;
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+	background-color: #8B0000;
+	
+`
+const SecondView = styled.View`
+	height: 80%;
+	width: 100%;
+	align-items: center;
+	padding-top: 4%;
+	background-color: black;
+`
 const RideTouchOpacity = styled.TouchableOpacity`
 	display: flex;
-	background-color: #d1d3d4;
+	${'' /* background-color: #6905E8; */}
+	background-color: #154360 ;
+	${'' /* background-color: #1B2631; */}
 	padding: 2.5%;
 	width: 90%;
-	height: 40;
+	${'' /* height: 40; */}
 	border-radius: 5px;
 	margin: 0 auto 3% auto;
-	border: 2px solid yellow;
-	flexdirection: row;
-	justifycontent: space-between;
+	border: 1px solid yellow;
+	flex-direction: row;
+	justify-content: space-between;
 `;
 
 const RideItem = styled.Text`
 	height: 100%;
+	color: white;
 `;
 
-const RideRequestsScrollView = styled.View`
-	height: 75%;
-`;
 
 const RideModalView = styled.View`
-	backgroundcolor: white;
-	margin: 50% auto 0 auto;
+	${'' /* background-color: #154360 ; */}
+	background-color: #1B2631;
+	${'' /* margin: 50% auto 0 auto; */}
 	padding: 5%;
 	width: 90%;
+	height: 50%;
+	align-items: center;
+	margin-top: 60%;
+	margin-left: 4%;
+	border-radius: 20%;
 `;
 const ModalRowView = styled.View`
-	display: flex;
-	flexdirection: row;
-	justifycontent: space-between;
-	margin-bottom: 4%;
+	width: 100%;
+	height: 8%;
+	justify-content: space-between;
+	margin-top: 2%;
+	background-color: #1B2631;
+	align-items: center;
 `;
-
+const ModalRowViewLast = styled.View`
+	width: 100%;
+	height: 15%;
+	justify-content: space-between;
+	margin-top: 2%;
+	background-color: #1B2631;
+	align-items: center;
+`;
+const BorderLine  = styled.View`
+	background-color: grey;
+	width: 90%;
+	margin-left: 5%;
+	height: 0.5%;
+	margin-bottom: 3%;
+	margin-top: 2%;
+`
+const DescriptionText = styled.Text`
+	opacity: 0.7;
+	color: white;
+	font-size: 12%;
+`
+const ValueText = styled.Text`
+	font-size: 15%;
+	color: white;
+`
 const ButtonsModalRowView = styled.View`
-	display: flex;
-	flexdirection: row;
-	justifycontent: space-between;
-	alignitems: center;
-	margintop: 7%;
+		${'' /* display: flex; */}
+	width: 100%;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-top: 2%;
 `;
 const InModalButton = styled.TouchableOpacity`
-	backgroundcolor: #d1d3d4;
+	background-color: green;
 	padding: 3%;
-`;
-
+	width: 30%;
+	margin-left: 2%;
+	border-radius: 10%;
+	align-items: center;
+	`;
+const InModalButtonPotential= styled.TouchableOpacity`
+	background-color: green;
+	padding: 3%;
+	width: 80%;
+	margin-left: 2%;
+	margin-top: 2%;
+	margin-bottom: 2%;
+	border-radius: 10%;
+	align-items: center;
+	`;
+const ButtonText = styled.Text`
+	font-weight: 500;
+	color: white;
+`
 export default ShowAllLiftRequests;

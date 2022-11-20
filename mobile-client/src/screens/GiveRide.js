@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import Map from "../components/Map";
-import OriginDestinationAutoComplete from "../components/originDestAutoComplete";
+import OriginDestinationAutoComplete from "../components/OriginDestAutoComplete";
 import { useSelector, useDispatch } from "react-redux";
 import {
 	selectDestination,

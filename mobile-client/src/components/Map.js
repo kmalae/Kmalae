@@ -23,48 +23,48 @@ export default function Map() {
 	}, [, origin, destination]);
 
 	return (
-		<View>
-			<MapView
-				style={page.map}
-				ref={mapRef}
-				mapType="mutedStandard"
-				initialRegion={{
-					latitude: parseFloat(origin.location.lat),
-					longitude: parseFloat(origin.location.lng),
-					latitudeDelta: 0.005,
-					longitudeDelta: 0.005,
-				}}>
-				{origin.location ? (
-					<Marker
-						coordinate={{
-							latitude: parseFloat(origin.location.lat),
-							longitude: parseFloat(origin.location.lng),
-						}}
-						title="Origin"
-						description={origin.description}
-						identifier="origin"
-					/>
-				) : null}
+		<MapView
+			style={page.map}
+			ref={mapRef}
+			mapType="mutedStandard"
+			initialRegion={{
+				latitude: parseFloat(origin.location.lat),
+				longitude: parseFloat(origin.location.lng),
+				latitudeDelta: 0.005,
+				longitudeDelta: 0.005,
+			}}
+		>
+			{origin.location ? (
+				<Marker
+					coordinate={{
+						latitude: parseFloat(origin.location.lat),
+						longitude: parseFloat(origin.location.lng),
+					}}
+					title="Origin"
+					description={origin.description}
+					identifier="origin"
+				/>
+			) : null}
 
-				{destination && destination.location ? (
-					<Marker
-						coordinate={{
-							latitude: parseFloat(destination.location.lat),
-							longitude: parseFloat(destination.location.lng),
-						}}
-						title="Destination"
-						description={destination.description}
-						identifier="destination"
-					/>
-				) : null}
-			</MapView>
-		</View>
+			{destination && destination.location ? (
+				<Marker
+					coordinate={{
+						latitude: parseFloat(destination.location.lat),
+						longitude: parseFloat(destination.location.lng),
+					}}
+					title="Destination"
+					description={destination.description}
+					identifier="destination"
+				/>
+			) : null}
+		</MapView>
 	);
 }
 
 const page = StyleSheet.create({
 	map: {
-		minHeight: 420,
-		zIndex: 0,
+		minHeight: "50%",
+		width: "100%",
+		margin: 0,
 	},
 });
