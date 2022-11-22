@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Map from "../components/Map";
-import OriginDestinationAutoComplete from "../components/OriginDestAutoComplete";
+import OriginDestinationAutoComplete from "../components/originDestAutoComplete";
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -17,7 +17,9 @@ import config from "../../config";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
-import formatDate from "../services/FormatDateTime";
+import { formatDatePlus4, formatDateNetural } from "../services/FormatDateTime";
+
+import ShowAllRideRequests from "./ShowAllRideRequests";
 
 import {
 	selectTransitionDelay,
@@ -37,7 +39,7 @@ const RideRequestScreen = ({ route }) => {
 	const navigation = useNavigation();
 	const transitionDelay = useSelector(selectTransitionDelay);
 	const isUpdating = route.params.isUpdating;
-	const orign = useSelector(selectOrigin);
+	const origin = useSelector(selectOrigin);
 	const destination = useSelector(selectDestination);
 	const timeOfDeparture = useSelector(selectTimeOfDeparture);
 	const rideLiftID = useSelector(selectRideLiftID);
@@ -59,21 +61,23 @@ const RideRequestScreen = ({ route }) => {
 	};
 
 	const makeRequest = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/rides/createRideRequest`, {
 				pickUpPoint: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description,
 				},
 				timeOfDeparture: formatedDateTime,
 			})
-			.then(() => navigation.navigate("RideRequestsListScreen"))
+			.then(() => navigation.navigate(ShowAllRideRequests))
 			.catch((error) => console.log(error.response.data.errors));
 		showMessage({
 			message: "Ride request created successufully",
@@ -82,27 +86,31 @@ const RideRequestScreen = ({ route }) => {
 	};
 
 	const updateRequest = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/rides/updateRideRequest`, {
 				rideRequestID: rideLiftID,
 				pickUpPoint: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description
 				},
 				timeOfDeparture: formatedDateTime,
 			})
-			.then(() => navigation.navigate("RideRequestsListScreen"))
+			.then(() => {
+				navigation.navigate(ShowAllRideRequests);
+				showMessage({
+					message: 'Ride request has updated successufully',
+					type: 'success',
+				});
+			})
 			.catch((error) => console.log(error.response.data.errors));
-		showMessage({
-			message: "Ride request has updated successufully",
-			type: "success",
-		});
 	};
 
 	const showDatePicker = () => {
@@ -136,8 +144,8 @@ const RideRequestScreen = ({ route }) => {
 								style={styless.dateTextInput}
 								value={
 									timeOfDeparture === null
-										? new Date()
-										: formatDate(timeOfDeparture)
+										? formatDatePlus4(new Date())
+									: formatDatePlus4(timeOfDeparture)
 								}
 								placeholder="Select Date"
 							/>
@@ -160,7 +168,7 @@ const RideRequestScreen = ({ route }) => {
 						minimumDate={new Date(new Date().getTime() + 4 * 60 * 60 * 1000)}
 						onConfirm={handleConfirm}
 						onCancel={hideDatePicker}
-						timeZoneOffsetInMinutes={0}
+						locale="en-AE"
 					/>
 				)}
 

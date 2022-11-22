@@ -13,27 +13,30 @@ import {
 	setVehicleID,
 	setAcceptableRadius,
 } from "../slices/RideLiftSlice.js";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import NumericInput from "react-native-numeric-input";
 import ShowAllPotentialPassengers from "./ShowAllPotentialPassengers";
-import formatDate from "../services/FormatDateTime";
+import {formatDatePlus4} from "../services/FormatDateTime";
 
 const ShowAllLiftRequests = () => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const isFocused = useIsFocused();
 
 	const [rideDetailsModalVisible, setRideDetailsModalVisibility] =
 		useState(false);
 	const [serverData, setServerData] = useState([]);
 	const [itemDetails, setItemDetails] = useState();
 
-	const handleShowPassengers = (pickUp, dest, time, radius) => {
+	const handleShowPassengers = (pickUp, dest, time, vehicle, radius) => {
+		dispatch(setVehicleID(vehicle));
 		dispatch(
 			setOrigin({
 				location: {
 					lat: pickUp.lat,
 					lng: pickUp.lng,
 				},
+				description: pickUp.description
 			})
 		);
 		dispatch(
@@ -42,6 +45,7 @@ const ShowAllLiftRequests = () => {
 					lat: dest.lat,
 					lng: dest.lng,
 				},
+				description: dest.description
 			})
 		);
 		dispatch(setTimeOfDeparture(time));
@@ -135,8 +139,9 @@ const ShowAllLiftRequests = () => {
 			.get(`${config.KMALAE_DOMAIN}/api/recomm/getUserLiftRequests`)
 			.then((res) => {
 				setServerData(res.data);
-			});
-	}, [serverData.status]);
+			})
+			.catch((error) => console.log(error.response.data.errors));
+	}, [isFocused]);
 
 	function ModalView({ item, modalVisible, onClose }) {
 		const [radius, setRadius] = useState({ value: 5 });
@@ -153,17 +158,17 @@ const ShowAllLiftRequests = () => {
 						<RideModalView>
 							<ModalRowView>
 							<DescriptionText>FROM</DescriptionText>
-								<ValueText>{item.currentLocation.lat}{item.currentLocation.lng}</ValueText>
+								<ValueText>{(item.currentLocation.description).substring(0, 32) + "..."}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
 							<DescriptionText>TO</DescriptionText>
-								<ValueText>{item.destination.lat}{item.destination.lng}</ValueText>
+								<ValueText>{(item.destination.description).substring(0,32) + "..."}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
 							<DescriptionText>TIME</DescriptionText>
-								<ValueText>{formatDate(item.timeOfDeparture)}</ValueText>
+								<ValueText>{formatDatePlus4(item.timeOfDeparture)}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
@@ -228,6 +233,7 @@ const ShowAllLiftRequests = () => {
 											item.currentLocation,
 											item.destination,
 											item.timeOfDeparture,
+											item.vehicle,
 											radius.value
 										)
 									}>
@@ -259,6 +265,7 @@ const ShowAllLiftRequests = () => {
 								marginLeft: "auto",
 								marginRight: "auto",
 								marginTop: "50%",
+								color: 'white'
 							}}>
 							No lifts to show
 						</Text>
@@ -269,7 +276,7 @@ const ShowAllLiftRequests = () => {
 								setRideDetailsModalVisibility(true);
 								setItemDetails(item);
 							}}>
-							<RideItem>{formatDate(timeOfDeparture)}</RideItem>
+							<RideItem>{formatDatePlus4(timeOfDeparture)}</RideItem>
 							<RideItem>{status}</RideItem>
 						</RideTouchOpacity>
 					)}

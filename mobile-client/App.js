@@ -7,21 +7,23 @@ import { StripeProvider } from "@stripe/stripe-react-native";
 import config from "./config";
 
 // importing screens
-import LoadingScreen from "./src/screens/LoadingScreen";
 
 import LoginScreen from "./src/screens/LoginScreen";
 import SignupScreen from "./src/screens/SignupScreen";
 import VehicleRegistration from "./src/screens/VehicleRegistration";
 import TopupScreen from "./src/screens/TopupScreen";
+import LoadingScreen from "./src/screens/LoadingScreen";
 
 import HomeScreen from "./src/screens/HomeScreen";
 import GiveRide from "./src/screens/GiveRide";
+import GetRide from "./src/screens/GetRide";
+import ShowAllRideRequests from "./src/screens/ShowAllRideRequests";
 import RideRequestScreen from "./src/screens/RideRequestScreen";
 import FlashMessage from "react-native-flash-message";
 import ShowAllUserVehicles from "./src/screens/ShowAllUserVehicle";
 import ShowAllLiftRequests from "./src/screens/ShowAllLiftRequests";
-import ShowAllRideRequests from "./src/screens/ShowAllRideRequests";
 import ShowAllPotentialPassengers from "./src/screens/ShowAllPotentialPassengers";
+import PassShowMatchRides from "./src/screens/PassShowMatchRides";
 
 import PaymentHistory from "./src/screens/PaymentHistory";
 import PaymentScreen from "./src/screens/PaymentScreen";
@@ -112,6 +114,13 @@ export default function App() {
 								headerShown: false,
 							}}
 						/>
+						<Stack.Screen
+								name="GetRide"
+								component={GetRide}
+								options={{
+									headerShown: false,
+								}}
+							/>
 
 						<Stack.Screen
 							name="RideRequestScreen"
@@ -120,6 +129,8 @@ export default function App() {
 								headerShown: false,
 							}}
 						/>
+
+						
 
 						<Stack.Screen
 							name="GiveRide"
@@ -136,6 +147,14 @@ export default function App() {
 								headerShown: false,
 							}}
 						/>
+
+							<Stack.Screen
+								name="PassShowMatchRides"
+								component={PassShowMatchRides}
+								options={{
+									headerShown: false,
+								}}
+							/>
 						<Stack.Screen
 							name="RideHistory"
 							component={RideHistory}

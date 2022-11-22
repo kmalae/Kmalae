@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import RideLiftOptions from "../components/RideLiftOptions";
+import ShowAllLiftRequests from "./ShowAllLiftRequests";
+import ShowAllRideRequests from "./ShowAllRideRequests";
 
 import {
 	selectTransitionDelay,
@@ -54,14 +56,14 @@ const HomeScreen = () => {
 						<ListButtonsContainer>
 							<ListButton
 								onPress={() => {
-									navigator.navigate("RideRequestsListScreen");
+									navigator.navigate(ShowAllRideRequests);
 								}}
 							>
 								<TextContainer>Show all Rides</TextContainer>
 							</ListButton>
 							<ListButton
 								onPress={() => {
-									navigator.navigate("LiftRequestsListScreen");
+									navigator.navigate(ShowAllLiftRequests);
 								}}
 							>
 								<TextContainer>Show all Lifts</TextContainer>

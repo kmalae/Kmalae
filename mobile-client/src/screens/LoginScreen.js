@@ -32,9 +32,9 @@ const LoginScreen = () => {
 		axios
 			.get(`${config.KMALAE_DOMAIN}/api/users/currentuser`)
 			.then((response) => {
-				if (response.data.currentUser !== null) {
-					navigator.replace("PaymentHistory");
-				}
+				// if (response.data.currentUser !== null) {
+				// 	navigator.replace("PaymentHistory");
+				// }
 			})
 			.catch((error) => console.log(error.response.data.errors));
 	}, []);

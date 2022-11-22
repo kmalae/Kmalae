@@ -11,13 +11,16 @@ import {
 	setRideLiftID,
 	setTimeOfDeparture,
 } from "../slices/RideLiftSlice";
-import { useNavigation } from "@react-navigation/native";
-import formatDate from "../services/FormatDateTime";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import { formatDatePlus4} from "../services/FormatDateTime";
+import PassShowMatchRides from "./PassShowMatchRides";
 import tw from "tailwind-react-native-classnames";
 
 const ShowAllRideRequests = () => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const isFocused = useIsFocused();
+
 
 	const [rideDetailsModalVisible, setRideDetailsModalVisibility] =
 		useState(false);
@@ -46,6 +49,12 @@ const ShowAllRideRequests = () => {
 		setRideDetailsModalVisibility(false);
 		navigation.navigate("GetRide", { isUpdating: true });
 	};
+
+	const handleShowPickUpRequests = (rideID) => {
+		dispatch(setRideLiftID(rideID));
+		setRideDetailsModalVisibility(false);
+		navigation.navigate(PassShowMatchRides);
+	}
 
 	const RideDeleteAlertMessage = (rideID) =>
 		Alert.alert("Are you sure?", "You are about to delete a ride!", [
@@ -100,8 +109,9 @@ const ShowAllRideRequests = () => {
 			.get(`${config.KMALAE_DOMAIN}/api/rides/getUserRideRequests`)
 			.then((res) => {
 				setServerData(res.data);
-			});
-	}, [serverData.status]);
+			})
+			.catch((error) => console.log(error.response.data.errors));
+	},[isFocused]);
 
 	function ModalView({ item, modalVisible, onClose }) {
 		return (
@@ -118,17 +128,17 @@ const ShowAllRideRequests = () => {
 						<RideModalView>
 							<ModalRowView>
 								<DescriptionText>FROM</DescriptionText>
-								<ValueText>{item.pickUpPoint.lat} {item.pickUpPoint.lng}</ValueText>
+								<ValueText>{(item.pickUpPoint.description).substring(0, 32) + "..."}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
 								<DescriptionText>TO</DescriptionText>
-								<ValueText>{item.destination.lat}{item.destination.lng}</ValueText>
+								<ValueText>{(item.destination.description).substring(0, 32) + "..."}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
 								<DescriptionText>TIME</DescriptionText>
-								<ValueText>{formatDate(item.timeOfDeparture)}</ValueText>
+								<ValueText>{formatDatePlus4(item.timeOfDeparture)}</ValueText>
 							</ModalRowView>
 							<BorderLine/>
 							<ModalRowView>
@@ -162,7 +172,15 @@ const ShowAllRideRequests = () => {
 									}}>
 									<ButtonText>Delete</ButtonText>
 								</InModalButton>
-							</ButtonsModalRowView>
+								</ButtonsModalRowView>
+
+								<InModalButton
+									onPress={() => {
+										handleShowPickUpRequests(item.id);
+									}}>
+									<ButtonText>pick up Requests</ButtonText>
+								</InModalButton>
+							
 						</RideModalView>
 					</Modal>
 				)}
@@ -195,7 +213,7 @@ const ShowAllRideRequests = () => {
 								setRideDetailsModalVisibility(true);
 								setItemDetails(item);
 							}}>
-							<RideItem>{formatDate(timeOfDeparture)}</RideItem>
+							<RideItem>{formatDatePlus4(timeOfDeparture)}</RideItem>
 							<RideItem>{status}</RideItem>
 						</RideTouchOpacity>
 					)}
@@ -265,7 +283,7 @@ const RideModalView = styled.View`
 	${'' /* margin: 50% auto 0 auto; */}
 	padding: 5%;
 	width: 90%;
-	height: 40%;
+	height: 43%;
 	align-items: center;
 	margin-top: 80%;
 	margin-left: 4%;
@@ -312,6 +330,7 @@ const InModalButton = styled.TouchableOpacity`
 	padding: 3%;
 	width: 30%;
 	margin-left: 2%;
+	margin-bottom: 7px;
 	border-radius: 10%;
 	align-items: center;
 `;

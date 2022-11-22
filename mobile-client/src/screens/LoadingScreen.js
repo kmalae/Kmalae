@@ -28,7 +28,7 @@ const LoadingScreen = () => {
 					if (response.data.currentUser === null) {
 						navigator.replace("LoginScreen");
 					} else {
-						navigator.replace("TopupScreen");
+						navigator.replace("LoginScreen");
 					}
 				})
 				.catch((error) => console.log(error));

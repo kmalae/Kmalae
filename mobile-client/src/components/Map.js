@@ -20,7 +20,7 @@ export default function Map() {
 			edgePadding: { top: 119, right: 50, bottom: 50, left: 50 },
 			animated: true,
 		});
-	}, [, origin, destination]);
+	}, [ origin, destination]);
 
 	return (
 		<MapView

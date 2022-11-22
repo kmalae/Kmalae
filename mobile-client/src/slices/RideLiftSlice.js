@@ -6,12 +6,14 @@ const initialState = {
 			lat: 24.39349,
 			lng: 54.583961,
 		},
+		description: null,
 	},
 	destination: {
 		location: {
 			lat: 0,
 			lng: 0,
 		},
+		description: null,
 	},
 	timeOfDeparture: null,
 	rideLiftID: "",

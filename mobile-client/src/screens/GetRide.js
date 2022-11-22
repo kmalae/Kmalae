@@ -24,13 +24,13 @@ import axios from "axios";
 import ShowAllRideRequests from "./ShowAllRideRequests";
 import { useNavigation } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
-import formatDate from "../services/FormatDateTime";
+import { formatDatePlus4, formatDateNetural } from "../services/FormatDateTime";
 
 const GetRide = ({ route }) => {
 	const navigation = useNavigation();
 	const isUpdating = route.params.isUpdating;
 
-	const orign = useSelector(selectOrigin);
+	const origin = useSelector(selectOrigin);
 	const destination = useSelector(selectDestination);
 	const timeOfDeparture = useSelector(selectTimeOfDeparture);
 	const rideLiftID = useSelector(selectRideLiftID);
@@ -48,17 +48,19 @@ const GetRide = ({ route }) => {
 	};
 
 	const makeRequest = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/rides/createRideRequest`, {
 				pickUpPoint: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description,
 				},
 				timeOfDeparture: formatedDateTime,
 			})
@@ -71,27 +73,31 @@ const GetRide = ({ route }) => {
 	};
 
 	const updateRequest = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/rides/updateRideRequest`, {
 				rideRequestID: rideLiftID,
 				pickUpPoint: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description
 				},
 				timeOfDeparture: formatedDateTime,
 			})
-			.then(() => navigation.navigate(ShowAllRideRequests))
-			.catch((error) => console.log(error.response.data.errors));
-		showMessage({
-			message: "Ride request has updated successufully",
-			type: "success",
-		});
+			.then(() => {
+				navigation.navigate(ShowAllRideRequests);
+				showMessage({
+					message: 'Ride request has updated successufully',
+					type: 'success',
+				});
+			})
+			.catch((error) => console.log(error.response.data.errors));	
 	};
 
 	const showDatePicker = () => {
@@ -119,8 +125,8 @@ const GetRide = ({ route }) => {
 							style={styles.dateTextInput}
 							value={
 								timeOfDeparture === null
-									? new Date()
-									: formatDate(timeOfDeparture)
+									? formatDatePlus4(new Date())
+									: formatDatePlus4(timeOfDeparture)
 							}
 							placeholder="Select Date"
 						/>
@@ -150,7 +156,7 @@ const GetRide = ({ route }) => {
 					minimumDate={new Date()}
 					onConfirm={handleConfirm}
 					onCancel={hideDatePicker}
-					timeZoneOffsetInMinutes={0}
+					locale="en-AE"
 				/>
 			)}
 
@@ -216,7 +222,6 @@ const styles = StyleSheet.create({
 		width: 200,
 		borderWidth: 1.5,
 		height: 40,
-		// padding: 10,
 	},
 	dateTextInput: {
 		left: 10,

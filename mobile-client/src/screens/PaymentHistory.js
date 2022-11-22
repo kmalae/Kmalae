@@ -56,12 +56,12 @@ const PaymentHistory = () => {
 							return (
 								<Item key={item.id}>
 									<AvatarContainer>
-										<Image
+										{/* <Image
 											source={{
 												uri: Image.resolveAssetSource(imageURI).uri,
 											}}
 											style={styles.avatar}
-										/>
+										/> */}
 									</AvatarContainer>
 									<DetailsItem>
 										<NameText>

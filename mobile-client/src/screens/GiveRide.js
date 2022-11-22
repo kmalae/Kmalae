@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import Map from "../components/Map";
-import OriginDestinationAutoComplete from "../components/OriginDestAutoComplete";
+import OriginDestinationAutoComplete from "../components/originDestAutoComplete";
 import { useSelector, useDispatch } from "react-redux";
 import {
 	selectDestination,
@@ -25,12 +25,12 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { showMessage } from "react-native-flash-message";
 import ShowAllLiftRequests from "./ShowAllLiftRequests";
-import formatDate from "../services/FormatDateTime";
+import {formatDatePlus4, formatDateNetural} from "../services/FormatDateTime";
 
 const GiveRide = ({ route }) => {
 	const navigation = useNavigation();
 
-	const orign = useSelector(selectOrigin);
+	const origin = useSelector(selectOrigin);
 	const destination = useSelector(selectDestination);
 	const timeOfDeparture = useSelector(selectTimeOfDeparture);
 	const rideLiftID = useSelector(selectRideLiftID);
@@ -51,18 +51,20 @@ const GiveRide = ({ route }) => {
 	};
 
 	const saveLift = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/recomm/createLiftRequest`, {
 				vehicleID: vehicleID,
 				currentLocation: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description
 				},
 				timeOfDeparture: formatedDateTime,
 			})
@@ -75,19 +77,21 @@ const GiveRide = ({ route }) => {
 	};
 
 	const updateRequest = () => {
-		const formatedDateTime = formatDate(timeOfDeparture);
+		const formatedDateTime = formatDateNetural(timeOfDeparture);
 
 		axios
 			.post(`${config.KMALAE_DOMAIN}/api/recomm/updateLiftRequest`, {
 				liftRequestID: rideLiftID,
 				vehicleID: vehicleID,
 				currentLocation: {
-					lat: orign.location.lat.toString(),
-					lng: orign.location.lng.toString(),
+					lat: origin.location.lat.toString(),
+					lng: origin.location.lng.toString(),
+					description: origin.description
 				},
 				destination: {
 					lat: destination.location.lat.toString(),
 					lng: destination.location.lng.toString(),
+					description: destination.description
 				},
 				timeOfDeparture: formatedDateTime,
 			})
@@ -97,7 +101,7 @@ const GiveRide = ({ route }) => {
 			"All datas >>>>>>>>>>>>>",
 			rideLiftID,
 			vehicleID,
-			orign,
+			origin,
 			destination,
 			formatedDateTime
 		);
@@ -118,16 +122,6 @@ const GiveRide = ({ route }) => {
 		setDatePickerVisibility(false);
 	};
 
-	// setting on render default date to be Today
-	const getRecievedDate = () => {
-		return new Date(timeOfDeparture).toLocaleDateString();
-	};
-
-	const getRecievedTime = () => {
-		return new Date(timeOfDeparture).toLocaleTimeString("en-AE", {
-			hour12: true,
-		});
-	};
 
 	return (
 		<View>
@@ -143,8 +137,8 @@ const GiveRide = ({ route }) => {
 							style={styles.dateTextInput}
 							value={
 								timeOfDeparture === null
-									? new Date()
-									: formatDate(timeOfDeparture)
+									? formatDatePlus4(new Date())
+									: formatDatePlus4(timeOfDeparture)
 							}
 							placeholder="Select Date"
 						/>
@@ -175,7 +169,7 @@ const GiveRide = ({ route }) => {
 					minimumDate={new Date()}
 					onConfirm={handleConfirm}
 					onCancel={hideDatePicker}
-					timeZoneOffsetInMinutes={0}
+					locale="en-AE"
 				/>
 			)}
 
