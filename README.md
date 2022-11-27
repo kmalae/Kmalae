@@ -1,4 +1,10 @@
-### Hi there 👋
+### Kmalae Carpooling System
+
+## Getting Started
+There are eight branches accross this project. Seven of them are the 7 service of this project and the other one is the cross-plaftorm mobile client.
+
+## 🔭 What'is coming...
+The system's Android and IOS application is coming soon on Play store and Apps store....
 
 <!--
 **kmalae/Kmalae** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
